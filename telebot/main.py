@@ -3,9 +3,6 @@ from FTXAPI import FtxClient
 import talib as ta
 import pandas as pd
 import numpy as np
-import kaleido
-import plotly.graph_objs as go
-from plotly.subplots import make_subplots
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import RandomizedSearchCV
@@ -19,7 +16,8 @@ from time import sleep
 import telebot
 import mplfinance as fplt
 
-ftx = FtxClient(api_key= "iaKVSvQ4Ubtns14q6wmcfYMfld3griAsM0xC_GgX", api_secret="YCFtWifq97e-gO7bEJxRTeOyYCQnoaL8zo5E71y9")
+# input your own ftx api key and api secret
+ftx = FtxClient(api_key= "", api_secret="")
 
 coin = 'BTC-PERP'
 
@@ -33,6 +31,22 @@ def checkTrade(margin: float) -> bool:
         index = lst.index("USD")
         return balances.free[index] > margin
     return False
+
+def getData(coin: str, time: str):
+    # getting the data frame
+    df = ftx.get_market_data(coin, time)
+    df = ftx.parse_ftx_response(df.json())
+    df.index = pd.to_datetime(df.index, infer_datetime_format=True)
+
+    # adding the RSI column
+    df['RSI'] = ta.RSI(df['close'], timeperiod = 9)
+
+    #adding the 50 day EMA
+    df['25EMA'] = ta.EMA(df['close'], timeperiod = 25)
+
+    #adding the 10 day EMA
+    df['10EMA'] = ta.EMA(df['close'], timeperiod = 10)
+    return df
 
 class telegrambot:
     def __init__(self, botToken, graphDirectory):
@@ -97,23 +111,6 @@ class telegrambot:
 
 token = "5393382907:AAEL6kg6HYwAWD90OKTYpV98RU18eAlgtkM"
 t = telegrambot(botToken= token, graphDirectory= "graph.png")
-
-def getData(coin, time):
-    # getting the data frame
-    df = ftx.get_market_data(coin, time)
-    df = ftx.parse_ftx_response(df.json())
-    df.index = pd.to_datetime(df.index, infer_datetime_format=True)
-
-    # adding the RSI column
-    df['RSI'] = ta.RSI(df['close'], timeperiod = 9)
-
-    #adding the 50 day EMA
-    df['25EMA'] = ta.EMA(df['close'], timeperiod = 25)
-
-    #adding the 10 day EMA
-    df['10EMA'] = ta.EMA(df['close'], timeperiod = 10)
-    return df
-
 
 site = f'https://api.telegram.org/bot{t.botToken}/getUpdates'
 data = requests.get(site).json()  # reads data from the url getUpdates
