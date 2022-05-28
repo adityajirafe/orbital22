@@ -17,11 +17,6 @@ export const globalStyles = StyleSheet.create({
       alignContent: 'center',
       alignItems: 'center',
     },
-    header: {
-        height: 80,
-        paddingTop: 38,
-        backgroundColor: 'lightblue',
-    },
     title: {
         textAlign: 'center',
         color: 'white',
@@ -30,7 +25,7 @@ export const globalStyles = StyleSheet.create({
         fontWeight: 'bold',
     },
     boldText: {
-      fontWeight: 'bold',
+      fontFamily: 'roboto-bold'
     },
     coinValet_title: {
         fontFamily: 'advent',
@@ -42,5 +37,9 @@ export const globalStyles = StyleSheet.create({
       textAlign: 'center',
       marginBottom: 20,
       fontFamily: 'roboto-bold'
+    },
+    text: {
+      fontFamily: 'roboto',
+      fontSize: 20
     },
   });

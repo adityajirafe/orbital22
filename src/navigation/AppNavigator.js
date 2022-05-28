@@ -10,7 +10,7 @@ import { auth } from '../firebase';
 import { 
     HomeScreen,
     AuthScreen,
-    LoginScreen,
+    MainScreen,
     SignupScreen
 } from '../screens';
 
@@ -40,7 +40,7 @@ const AppNavigator = () => {
     const logoutHandler = () => {
         signOut(auth).then(() => {
             setIsAuth(false);
-            setUser({});
+            // setUser({});
         });
     };
 
@@ -84,12 +84,12 @@ const AppNavigator = () => {
         <AuthStack.Navigator>
             <AuthStack.Screen
                 name = "login"
-                options={{ title: 'Login',
+                options={{ title: 'CoinValet',
                     headerStyle: { backgroundColor: '#c8dfe4'} ,
                     headerTitleStyle: {fontFamily: 'roboto-bold'},
                     headerRight: () => <LogoutIcon />,
                     }}
-                component = {LoginScreen}
+                component = { MainScreen }
             /> 
         </AuthStack.Navigator>
     );
