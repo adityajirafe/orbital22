@@ -16,7 +16,7 @@ from time import sleep
 import telebot
 import mplfinance as fplt
 
-# input your own ftx api key and api secret
+# input your own api key and api secret
 ftx = FtxClient(api_key= "", api_secret="")
 
 coin = 'BTC-PERP'
@@ -31,22 +31,6 @@ def checkTrade(margin: float) -> bool:
         index = lst.index("USD")
         return balances.free[index] > margin
     return False
-
-def getData(coin: str, time: str):
-    # getting the data frame
-    df = ftx.get_market_data(coin, time)
-    df = ftx.parse_ftx_response(df.json())
-    df.index = pd.to_datetime(df.index, infer_datetime_format=True)
-
-    # adding the RSI column
-    df['RSI'] = ta.RSI(df['close'], timeperiod = 9)
-
-    #adding the 50 day EMA
-    df['25EMA'] = ta.EMA(df['close'], timeperiod = 25)
-
-    #adding the 10 day EMA
-    df['10EMA'] = ta.EMA(df['close'], timeperiod = 10)
-    return df
 
 class telegrambot:
     def __init__(self, botToken, graphDirectory):
@@ -112,36 +96,55 @@ class telegrambot:
 token = "5393382907:AAEL6kg6HYwAWD90OKTYpV98RU18eAlgtkM"
 t = telegrambot(botToken= token, graphDirectory= "graph.png")
 
+def getData(coin: str, time: str):
+    # getting the data frame
+    df = ftx.get_market_data(coin, time)
+    df = ftx.parse_ftx_response(df.json())
+    df.index = pd.to_datetime(df.index, infer_datetime_format=True)
+
+    # adding the RSI column
+    df['RSI'] = ta.RSI(df['close'], timeperiod = 9)
+
+    #adding the 50 day EMA
+    df['50EMA'] = ta.EMA(df['close'], timeperiod = 50)
+
+    #adding the 10 day EMA
+    df['10EMA'] = ta.EMA(df['close'], timeperiod = 10)
+    return df
+
+
 site = f'https://api.telegram.org/bot{t.botToken}/getUpdates'
 data = requests.get(site).json()  # reads data from the url getUpdates
 #chatid = data['result'][0]['message']['from']['id']
 chatid = '127483518'
 
-if (t.TelebotPoll(60) != '/start'):
-    t.sendText(chatid, "Please select an option from the menu")
-else:
+t.sendText(chatid, "Welcome to CoinValet (by Aditya and Cheng Yang)\n\nPlease input your username")
+username = t.TelebotPoll(60)
+while (username == 'null'):
     t.sendText(chatid, "Welcome to CoinValet (by Aditya and Cheng Yang)\n\nPlease input your username")
     username = t.TelebotPoll(60)
-    while (username == 'null'):
-        t.sendText(chatid, "Welcome to CoinValet (by Aditya and Cheng Yang)\n\nPlease input your username")
-        username = t.TelebotPoll(60)
+t.sendText(chatid, username + "\nPlease input your password")
+password = t.TelebotPoll(60)
+while (password == 'null'):
     t.sendText(chatid, username + "\nPlease input your password")
     password = t.TelebotPoll(60)
-    while (password == 'null'):
-        t.sendText(chatid, username + "\nPlease input your password")
-        password = t.TelebotPoll(60)
 
 position = 0
 while True:
-    df = getData(coin, '15m')
+    df = getData(coin, '1h')
 
     #plotting the graph and saving it
+    ap2 = [fplt.make_addplot(df['50EMA'], color='b', panel= 1), 
+            fplt.make_addplot(df['10EMA'], color='y', panel= 1),
+            fplt.make_addplot(df['RSI'], color='#6a0dad', panel= 2)]
     fplt.plot(
             df,
             type='candle',
             style= 'charles',
             title= coin + ' chart',
             ylabel='Price ($)',
+            main_panel= 1,
+            addplot= ap2,
             savefig= "graph.png"
     )
     t.sendText(chatid, "BTC price")
@@ -149,7 +152,7 @@ while True:
     t.sendImage(chatid, "graph.png")
 
     i = len(df) - 1
-    if (df['10EMA'][i] > df['25EMA'][i] and position == 0):
+    if (df['10EMA'][i] > df['50EMA'][i] and position == 0):
         t.sendText(chatid, "time to open LONG position\n\n/trade\n\n/no_trade")
         reply = t.TelebotPoll(30)
         if (reply == '/trade'):
@@ -169,7 +172,7 @@ while True:
             price = df['close'][i]
             t.sendText(chatid, f"Trade has NOT been taken\nat {price}")
             position = 0
-    elif (df['10EMA'][i] < df['25EMA'][i] and position == 0):
+    elif (df['10EMA'][i] < df['50EMA'][i] and position == 0):
         t.sendText(chatid, "time to open SHORT position\n\n/trade\n\n/no_trade")            
         reply = t.TelebotPoll(30)
         if (reply == '/trade'):
@@ -189,7 +192,7 @@ while True:
             price = df['close'][i]
             t.sendText(chatid, f"Trade has NOT been taken\nat {price}")
             position = 0
-    elif (df['10EMA'][i] <= df['25EMA'][i] and position == 1):
+    elif (df['10EMA'][i] <= df['50EMA'][i] and position == 1):
         t.sendText(chatid, f"time to close LONG position\n\n/close\n\n/dont_close")
         reply = t.TelebotPoll(30)
         if (reply == '/close'):
@@ -202,7 +205,7 @@ while True:
             price = df['close'][i]
             t.sendText(chatid, f"Trade has NOT been closed\nat {price}")
             position = 1
-    elif (df['10EMA'][i] >= df['25EMA'][i] and position == 2):
+    elif (df['10EMA'][i] >= df['50EMA'][i] and position == 2):
         t.sendText(chatid, "time to close SHORT position\n\n/close\n\n/dont_close")
         reply = t.TelebotPoll(30)
         if (reply == '/close'):
