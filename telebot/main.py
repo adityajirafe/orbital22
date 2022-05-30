@@ -84,98 +84,104 @@ def getData(coin: str, time: str):
 def trade(t: TelegramBot):
     position = 0
     while True:
-        df = getData(coin, '1h')
+        try:
+            df = getData(coin, '1h')
+            df = df.tail(150)
+            print(df)
+            #plotting the graph and saving it
+            ap2 = [fplt.make_addplot(df['50EMA'], color='b', panel= 1), 
+                    fplt.make_addplot(df['10EMA'], color='y', panel= 1),
+                    fplt.make_addplot(df['RSI'], color='#6a0dad', panel= 2)]
+            
+            fplt.plot(
+                    df,
+                    type='candle',
+                    style= 'charles',
+                    title= coin + ' chart',
+                    ylabel='Price ($)',
+                    main_panel= 1,
+                    addplot= ap2,
+                    savefig= "graph.png"
+            )
+            i = len(df) - 1
+            t.sendText(f"BTC price is currently {df['close'][i]} USD")
+            t.sendImage("graph.png")
 
-        #plotting the graph and saving it
-        ap2 = [fplt.make_addplot(df['50EMA'], color='b', panel= 1), 
-                fplt.make_addplot(df['10EMA'], color='y', panel= 1),
-                fplt.make_addplot(df['RSI'], color='#6a0dad', panel= 2)]
-        fplt.plot(
-                df,
-                type='candle',
-                style= 'charles',
-                title= coin + ' chart',
-                ylabel='Price ($)',
-                main_panel= 1,
-                addplot= ap2,
-                savefig= "graph.png"
-        )
-        i = len(df) - 1
-        t.sendText(f"BTC price is {df['close'][i]}")
-        t.sendImage("graph.png")
-        
-        if (df['10EMA'][i] > df['50EMA'][i] and position == 0):
-            t.sendText("time to open LONG position\n\n/trade\n\n/no_trade")
-            reply = t.TelebotPoll(30)
-            if (reply == '/trade'):
-                if (checkTrade(1)):
-                    try:
-                        price = df['close'][i]
-                        ftx.place_order(market= coin, side= 'buy', price= str(price), type= 'limit', size= 0.001)
-                        print(order["status"])
-                        t.sendText(f"Trade has been taken\nat {price}")
-                        position = 1
-                    except:
-                        t.sendText( "some other error occured")
-                else:
-                    t.sendText("not enough money to make the trade")
+            if (df['10EMA'][i] > df['50EMA'][i] and position == 0):
+                t.sendText("time to open LONG position\n\n/trade\n\n/no_trade")
+                reply = t.TelebotPoll(30)
+                if (reply == '/trade'):
+                    if (checkTrade(1)):
+                        try:
+                            price = df['close'][i]
+                            ftx.place_order(market= coin, side= 'buy', price= str(price), type= 'limit', size= 0.001)
+                            print(order["status"])
+                            t.sendText(f"Trade has been taken\nat {price}")
+                            position = 1
+                        except:
+                            t.sendText( "some other error occured")
+                    else:
+                        t.sendText("not enough money to make the trade")
 
-            else: 
-                price = df['close'][i]
-                t.sendText(f"Trade has NOT been taken\nat {price}")
-                position = 0
-        elif (df['10EMA'][i] < df['50EMA'][i] and position == 0):
-            t.sendText("time to open SHORT position\n\n/trade\n\n/no_trade")            
-            reply = t.TelebotPoll(30)
-            if (reply == '/trade'):
-                if (checkTrade(1)):
-                    try:
-                        price = df['close'][i]
-                        ftx.place_order(market= coin, side= 'sell', price= str(price), type= 'limit', size= 0.001)
-                        print(order["status"])
-                        t.sendText(f"Trade has been taken\nat {price}")
-                        position = 2
-                    except:
-                        t.sendText("some other error occured")
-                else:
-                    t.sendText("not enough money bij")
+                else: 
+                    price = df['close'][i]
+                    t.sendText(f"Trade has NOT been taken\nat {price}")
+                    position = 0
+            elif (df['10EMA'][i] < df['50EMA'][i] and position == 0):
+                t.sendText("time to open SHORT position\n\n/trade\n\n/no_trade")            
+                reply = t.TelebotPoll(30)
+                if (reply == '/trade'):
+                    if (checkTrade(1)):
+                        try:
+                            price = df['close'][i]
+                            ftx.place_order(market= coin, side= 'sell', price= str(price), type= 'limit', size= 0.001)
+                            print(order["status"])
+                            t.sendText(f"Trade has been taken\nat {price}")
+                            position = 2
+                        except:
+                            t.sendText("some other error occured")
+                    else:
+                        t.sendText("not enough money bij")
 
-            else: 
-                price = df['close'][i]
-                t.sendText(f"Trade has NOT been taken\nat {price}")
-                position = 0
-        elif (df['10EMA'][i] <= df['50EMA'][i] and position == 1):
-            t.sendText(f"time to close LONG position\n\n/close\n\n/dont_close")
-            reply = t.TelebotPoll(30)
-            if (reply == '/close'):
-                price = df['close'][i]
-                t.sendText(f"Trade has been closed\nat {price}")
-                position = 0
-                ftx.place_order(market= coin, side= 'sell', price= str(price), type= 'limit', size= 0.001)
-                print(order["status"])
-            else: 
-                price = df['close'][i]
-                t.sendText(f"Trade has NOT been closed\nat {price}")
-                position = 1
-        elif (df['10EMA'][i] >= df['50EMA'][i] and position == 2):
-            t.sendText("time to close SHORT position\n\n/close\n\n/dont_close")
-            reply = t.TelebotPoll(30)
-            if (reply == '/close'):
-                price = df['close'][i]
-                t.sendText(f"Trade has been closed\nat {price}")
-                position = 0
-                order = ftx.place_order(market= coin, side= 'buy', price= str(price), type= 'limit', size= 0.001)
-                print(order["status"])
-            else: 
-                price = df['close'][i]
-                t.sendText(f"Trade has NOT been closed\nat {price}")
-                position = 2
-        response = t.TelebotPoll(60)
-        if (response == "/mybalance"):
-            t.sendText(str(ftx.get_balances()))
-        elif (response == "/logout"):            
-            t.sendText('successfully logged out')
-            break
+                else: 
+                    price = df['close'][i]
+                    t.sendText(f"Trade has NOT been taken\nat {price}")
+                    position = 0
+            elif (df['10EMA'][i] <= df['50EMA'][i] and position == 1):
+                t.sendText(f"time to close LONG position\n\n/close\n\n/dont_close")
+                reply = t.TelebotPoll(30)
+                if (reply == '/close'):
+                    price = df['close'][i]
+                    t.sendText(f"Trade has been closed\nat {price}")
+                    position = 0
+                    ftx.place_order(market= coin, side= 'sell', price= str(price), type= 'limit', size= 0.001)
+                    print(order["status"])
+                else: 
+                    price = df['close'][i]
+                    t.sendText(f"Trade has NOT been closed\nat {price}")
+                    position = 1
+            elif (df['10EMA'][i] >= df['50EMA'][i] and position == 2):
+                t.sendText("time to close SHORT position\n\n/close\n\n/dont_close")
+                reply = t.TelebotPoll(30)
+                if (reply == '/close'):
+                    price = df['close'][i]
+                    t.sendText(f"Trade has been closed\nat {price}")
+                    position = 0
+                    order = ftx.place_order(market= coin, side= 'buy', price= str(price), type= 'limit', size= 0.001)
+                    print(order["status"])
+                else: 
+                    price = df['close'][i]
+                    t.sendText(f"Trade has NOT been closed\nat {price}")
+                    position = 2
+            response = t.TelebotPoll(60)
+            if (response == "/mybalance"):
+                t.sendText(str(ftx.get_balances()))
+            elif (response == "/logout"):            
+                t.sendText('successfully logged out')
+                break
+        except:
+            sleep(10)
+            pass
 
 def mainmain(chatid: str):
     t = TelegramBot(botToken= token, chatid= chatid, graphDirectory= "graph.png")
@@ -190,11 +196,15 @@ def mainmain(chatid: str):
 site = f'https://api.telegram.org/bot{token}/getUpdates'
 
 while True:
-    data = requests.get(site).json()  # reads data from the url getUpdates
-    lastMsg = len(data['result']) - 1
-    chatid = str(data['result'][lastMsg]['message']['from']['id'])
+    try:
+        data = requests.get(site).json()  # reads data from the url getUpdates
+        lastMsg = len(data['result']) - 1
+        chatid = str(data['result'][lastMsg]['message']['from']['id'])
 
-    # if chatid not in list_of_chatids:
-    #     list_of_chatids.append(chatid)
-    # print(list_of_chatids)
-    mainmain(chatid)
+        # if chatid not in list_of_chatids:
+        #     list_of_chatids.append(chatid)
+        # print(list_of_chatids)
+        mainmain(chatid)
+    except:
+        sleep(10)
+        pass
