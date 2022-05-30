@@ -5,6 +5,10 @@ export const globalStyles = StyleSheet.create({
       flex: 1,
       backgroundColor: '#c8dfe4',
     },
+    blankContainer: {
+      flex: 0.5,
+      backgroundColor: '#c8dfe4',
+    },
     container_auth: {
       backgroundColor: '#c8dfe4',
       flex: 1,
@@ -33,7 +37,7 @@ export const globalStyles = StyleSheet.create({
         color: 'black',
     },
     welcomeText: {
-      fontSize: 28,
+      fontSize: 20,
       textAlign: 'center',
       marginBottom: 20,
       fontFamily: 'roboto-bold'
