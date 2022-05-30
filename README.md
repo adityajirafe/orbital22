@@ -52,3 +52,41 @@ On the home page, add a web app to get started and give it a name. Click registe
 
 Copy the values under ```const firebaseConfig``` into your .env file as stated above
 
+## Running the Telebot
+
+Disclaimer: Since the bot is in constant development, we will not be hosting the
+bot on any server for visitors to try, as it limits our ability to improve the
+bot.
+
+As such, to those who wish to test the bot, the solution is to clone the
+repository and create your own bot. A brief description is showed below:
+
+Run ```cd orbital22/telebot```
+
+Run ```code .``` to open up the files in VSCode
+
+### For Windows:
+
+Run ```python -m venv venv``` in the terminal to create a virtual environment
+
+Run ```venv\Scripts\Activate.ps1``` in the terminal to navigate to the working environment
+
+### For Mac:
+
+Run ```pip install virtualenv```
+
+Run ```source venv/bin/activate``` 
+
+### General:
+
+All dependencies used for the python telegram bot are stored in ```requirements.txt```
+
+Run ```pip install -r requirements.txt``` in the venv in order to download the dependencies into the working environment
+
+Using @BotFather on telegram, create a new bot and receive the bot token. input
+it inside ```telebot/main.py```
+
+Input your ```FTX api_key``` and ```api_secret``` inside ```telebot/main.py```
+
+Run ```python main.py```
+
