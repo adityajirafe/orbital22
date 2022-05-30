@@ -100,11 +100,10 @@ def trade(t: TelegramBot):
                 addplot= ap2,
                 savefig= "graph.png"
         )
-        t.sendText("BTC price")
-        t.sendText(df['close'])
-        t.sendImage("graph.png")
-
         i = len(df) - 1
+        t.sendText(f"BTC price is {df['close'][i]}")
+        t.sendImage("graph.png")
+        
         if (df['10EMA'][i] > df['50EMA'][i] and position == 0):
             t.sendText("time to open LONG position\n\n/trade\n\n/no_trade")
             reply = t.TelebotPoll(30)
