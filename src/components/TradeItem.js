@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const TradeItem = props => {
@@ -11,9 +11,9 @@ const TradeItem = props => {
                 <Text style = {styles.text}>{item.time}</Text>
             </View>
             <View style = {[styles.row, index % 2 == 0 ? styles.even : styles.odd]}>
-                <Text style = {styles.text}>Units: {item.units}</Text>
-                <Text style = {styles.text}>Price: {item.price}</Text>
-                <Text style = {[styles.text, styles.green]}>Value: {item.value}</Text>
+                <Text style = {styles.text}>Units: {'\n' + item.units}</Text>
+                <Text style = {styles.text}>Price: {'\n' + item.price}</Text>
+                <Text style = {[styles.text, styles.green]}>Value: {'\n' + item.value}</Text>
             </View>
         </View>
     )
@@ -45,8 +45,9 @@ const styles = StyleSheet.create({
     },
     text: {
         fontFamily: 'roboto',
-        fontSize: 20,
+        fontSize: 15,
         flex: 1,
+        justifyContent: 'space-evenly'
     },
     green: {
         color: 'green'

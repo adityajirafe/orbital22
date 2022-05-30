@@ -90,7 +90,7 @@ const AuthScreen = () => {
                         title={'LOG IN'}
                     />
                 </View>
-                <View style ={globalStyles.container}></View>
+                <View style ={globalStyles.blankContainer}></View>
             </View>
         </KeyboardAvoidingView>
     );
