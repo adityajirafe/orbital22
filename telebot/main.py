@@ -20,11 +20,12 @@ import mplfinance as fplt
 # create an instance of the database
 db = DBHelper()
 db.setup()
-# input your own api key and api secret
+# input your own FTX api key and api secret
 api_key = ""
 api_secret=""
+
 ftx = FtxClient(api_key= api_key, api_secret= api_secret)
-token = "5393382907:AAEL6kg6HYwAWD90OKTYpV98RU18eAlgtkM"
+token = "" # Telegram bot token
 
 coin = 'BTC-PERP'
 
