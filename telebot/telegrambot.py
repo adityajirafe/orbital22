@@ -1,47 +1,66 @@
-from re import L
 import requests
 from datetime import timedelta, datetime
 
-class TelegramBot:
-    def __init__(self, botToken: str, chatid: str, graphDirectory: str):
-        self.botToken = botToken
-        self.chatid = chatid
-        self.graphDirectory = graphDirectory
 
-    def TelebotPoll(self, waitTime):
+class TelegramBot:
+    def __init__(self, botToken: str):
+        self.botToken = botToken
+        # self.initialised = False
+        self.chatids = {}
+        self.auth_users = []
+
+    def TelebotPoll(self, waitTime: int):
+
         site = f'https://api.telegram.org/bot{self.botToken}/getUpdates'
         data = requests.get(site).json()  # reads data from the url getUpdates
-        lastMsg = len(data['result']) - 1
-        updateIdSave = data['result'][lastMsg]['update_id']
+        
+        ## Store the update id to compare new messages to 
+        old_update_id = data['result'][0]['update_id'] #replace with -1
         time = datetime.now()
         waitingTime = time + timedelta(seconds=waitTime)
-        text = ''
+        result = []
 
         while True:
+            if waitingTime < datetime.now():
+                result = []
+                break
             data = requests.get(site).json()  # reads data from the url getUpdates
             if (data['result'] != []):
-                lastMsg = len(data['result']) - 1
-                updateId = data['result'][lastMsg]['update_id']
-                chatid = str(data['result'][lastMsg]['message']['chat']['id'])  # reads chat ID
-                if (updateId != updateIdSave):  # compares update ID
-                    text = data['result'][lastMsg]['message']['text']  # reads what they have sent
-                    requests.get(f'https://api.telegram.org/bot{self.botToken}/getUpdates?offset=' + str(updateId))
-                    break
-                elif waitingTime < datetime.now():
-                    text = ''
-                    break
-        return text
+                for entry in data['result']:
+                    new_update_id = entry['update_id']
+                    if new_update_id <= old_update_id:
+                        continue
+                    elif new_update_id > old_update_id:
+                        chat_id = str(entry['message']['chat']['id'])  # reads chat ID
+                        name = str(entry['message']['chat']['first_name'])  # reads username
+    
+                        text = str(entry['message']['text'])  # reads what they have sent
+                        requests.get(f'https://api.telegram.org/bot{self.botToken}/getUpdates?offset=' + str(new_update_id))
+                        result.append({'first_name': name, 'chat_id': chat_id, 'message': text})
+                        print(result)
+                        continue
+                
+                return result        
+        return result
+        
 
-    def sendText(self, message):
-        URL=f"https://api.telegram.org/bot{self.botToken}/sendMessage?chat_id={self.chatid}&text={message}"
+    def sendText(self, message, chat_id):
+        URL=f"https://api.telegram.org/bot{self.botToken}/sendMessage?chat_id={chat_id}&text={message}"
         requests.get(URL)
 
-    def sendImage(self, directory):
+    def sendImage(self, directory, chat_id):
         try:
             imgpath = {'photo': open(directory, 'rb')}
             requests.post(
-                f'https://api.telegram.org/bot{self.botToken}/sendPhoto?chat_id={self.chatid}',
+                f'https://api.telegram.org/bot{self.botToken}/sendPhoto?chat_id={chat_id}',
                 files=imgpath)  # Sending Automated Image
             print("Image Sent")
         except:
             print("Failed to send Image")
+
+    def authenticate_user(self, chat_id):
+        self.auth_users.append(chat_id)
+        
+
+    # def initialise_bot(self):
+    #     self.initalised = True
