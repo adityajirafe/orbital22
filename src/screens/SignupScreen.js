@@ -10,14 +10,38 @@ import React, { useState } from 'react';
 import {
     createUserWithEmailAndPassword
 } from 'firebase/auth';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 import { AuthTextInput, AuthPressable, FeatureImage } from '../components';
 import { globalStyles } from '../styles/Styles';
-import { auth } from '../firebase';
+import { auth, fs } from '../firebase';
+
+
+const useConstructor = (callBack = () => {}) => {
+    const [hasBeenCalled, setHasBeenCalled] = useState(false);
+    if (hasBeenCalled) return;
+    callBack();
+    setHasBeenCalled(true);
+  }
 
 const SignupScreen = () => {
+    const [users, setUsers] = useState([]);
+    useConstructor(() => {
+        console.log(
+          "Rendering screen now"
+        );
+        const subscriber = onSnapshot(doc(fs, 'Directory/', 'Users'), doc => {
+            let persons = doc.data()
+            console.log(persons)
+            Object.keys(persons).forEach((username) => {
+                setUsers(users => [...users, username])
+            })
+        })
+      });
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
 
     const signUpAlert = () => {
         Alert.alert(
@@ -37,35 +61,56 @@ const SignupScreen = () => {
         )
     }
 
+    const usernameExistsAlert = () => {
+        Alert.alert(
+            "Username is taken, please choose another username!"
+        )
+    }
+
+    const usernameChecker = () => {
+        console.log(username)
+        console.log(users)
+        if (users.find(u => u == username)) {
+            usernameExistsAlert();
+            return;
+        }
+        console.log("Username not taken")
+        return signUpHandler();
+    }
+
     const signUpHandler = async () => {
-        if (email.length === 0 || password.length < 6) {
+        if (email.length === 0 || password.length === 0 || username.length === 0) {
             missingFieldsAlert();
             return;
         }
 
-        try {
-            const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredentials.user;
+        await createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredentials) => {
+                const user = userCredentials.user;
 
-            // To show the user object returned
-            console.log(user);
+                // To show the user object returned
+                console.log(user);
 
-            restoreForm();
-            signUpAlert();
-        } catch (error) {
-            const errorCode = error.code;
-            const errorMessage = error.message;
+                setExists(false)
+                restoreForm();
+                signUpAlert();
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
 
-            console.error('[signUpHandler]', errorCode, errorMessage);
-            if (errorCode == 'auth/email-already-in-use') {
-                userExistsAlert();
-            }
-        }
+                console.error('[signUpHandler]', errorCode, errorMessage);
+                if (errorCode == 'auth/email-already-in-use') {
+                    userExistsAlert();
+                }
+            });
     };
+
 
     const restoreForm = () => {
         setEmail('');
         setPassword('');
+        setUsername('');
         Keyboard.dismiss();
     };
 
@@ -92,12 +137,18 @@ const SignupScreen = () => {
                         textHandler={setPassword}
                         secureTextEntry
                     />
+                    <AuthTextInput
+                        value={username}
+                        placeholder='Your Unique Username'
+                        textHandler={setUsername}
+                    />
+                    {/* <Text>{users}</Text> */}
                     <AuthPressable
-                        onPressHandler={signUpHandler}
+                        onPressHandler={usernameChecker}
                         title={'SIGN UP'}
                     />
                 </View>
-                <View style ={globalStyles.container}></View>
+                <View style ={globalStyles.blankContainer}></View>
             </View>
         </KeyboardAvoidingView>
     );

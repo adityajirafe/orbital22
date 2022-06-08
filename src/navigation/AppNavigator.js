@@ -34,13 +34,12 @@ const AppNavigator = () => {
                 }
             }
         );
-        return unsubscribeAuthStateChanged;
+        return () => unsubscribeAuthStateChanged();
     }, []);
 
     const logoutHandler = () => {
         signOut(auth).then(() => {
             setIsAuth(false);
-            // setUser({});
         });
     };
 
