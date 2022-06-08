@@ -1,3 +1,5 @@
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -6,16 +8,14 @@ import {
     Platform,
     Alert
 } from 'react-native';
-import React, { useState } from 'react';
-import {
-    signInWithEmailAndPassword
-} from 'firebase/auth';
 
 import { AuthTextInput, AuthPressable, FeatureImage } from '../components';
-import { globalStyles } from '../styles/Styles';
 import { auth } from '../firebase';
+import { globalStyles } from '../styles/Styles';
+
 
 const AuthScreen = () => {
+    
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -37,23 +37,23 @@ const AuthScreen = () => {
             return;
         }
 
-        try {
-            const userCredentials = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredentials.user;
+        await signInWithEmailAndPassword(auth, email, password)
+            .then((userCredentials) => {
+                const user = userCredentials.user;
+                
+                console.log(user);
 
-            // To show the user object returned
-            console.log(user);
+                restoreForm();
+            })
+            .catch ((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
 
-            restoreForm();
-        } catch (error) {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-
-            console.error('[loginHandler]', errorCode, errorMessage);
-            if (errorCode == 'auth/user-not-found') {
-                userNotFoundAlert();
-            }
-        }
+                console.error('[loginHandler]', errorCode, errorMessage);
+                if (errorCode == 'auth/user-not-found') {
+                    userNotFoundAlert();
+                }
+            });
     };
 
     const restoreForm = () => {

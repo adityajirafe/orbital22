@@ -16,6 +16,11 @@ class JobQueue:
     def push_job(self, job_item):
         self.queue.append(job_item)
 
+    def is_valid_input(self, chat_id):
+        if chat_id in self.waiting:
+            return True
+        return False
+
     def execute(self):
         #for i in self.queue:
             #print(f"Task: {i.message}")

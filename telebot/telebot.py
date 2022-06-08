@@ -18,7 +18,6 @@ FTX_API_KEY = os.getenv('FtxApiKey')
 FTX_API_SECRET = os.getenv('FtxApiSecret')
 
 
-
 def initialisation():
     return TelegramBot(TOKEN)
     
@@ -50,12 +49,20 @@ def main():
                 elif (message == '/notrade'):
                     pending_job = Job_Item(chat_id, message, Jobs.NO_TRADE)
 
-                else:
+                elif job_queue.is_valid_input(chat_id):
                     pending_job = Job_Item(chat_id, message, Jobs.USERNAME)
+                
+                else:
+                    bot.sendText(
+                        "Invalid input, press /start to use CoinValet or use another valid prompt",
+                        chat_id
+                    )
+                    continue
 
                 if pending_job:
                     job_queue.push_job(pending_job)
                     pending_job = None
+
             job_queue.execute()
             trading_algo(bot, coins, interval, ftx)
         except:

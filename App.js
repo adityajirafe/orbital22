@@ -1,16 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
-import { View, LogBox } from 'react-native';
-import React, { useState, useEffect, useCallback } from 'react';
-import { globalStyles } from './src/styles/Styles';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import AppNavigator from './src/navigation/AppNavigator';
+import React, { useState, useEffect, useCallback, Component } from 'react';
+import { View, LogBox } from 'react-native';
 
+import AppNavigator from './src/navigation/AppNavigator';
+import { globalStyles } from './src/styles/Styles';
 
 LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //Ignore all log notifications
 
+
 export default App = () => {
+  
   const [appIsReady, setAppIsReady] = useState(false);
 
   useEffect(() => {
