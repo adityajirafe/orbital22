@@ -42,10 +42,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontFamily: 'roboto-bold',
         fontSize: 32,
-        borderColor: 'white',
+        borderColor: '#FEFFED',
         borderWidth: 10,
-        backgroundColor: 'white',
+        backgroundColor: '#FEFFED',
         width: 200,
+        borderRadius: 20
     },
     empty: {
         flex: 0.3
