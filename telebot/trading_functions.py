@@ -19,10 +19,13 @@ def trading_algo(bot, coins, interval):
     # run for one coin first -> BTC
     for coin in coins:
         shortened_coin = shortform(coin)
+        # gets the first key of the dictionary which is a chat id
         temp_chat_id = list(bot.auth_users.keys())[0]
+        # gets the ftx object tagged to that chat id
         ftx = bot.auth_users[temp_chat_id]
         suggested_trade = detect_trade(bot, coin, interval, ftx)
         price = suggested_trade['price']
+        # store the coin and its price in the dictionary to be accessed later on
         bot.update_coin_prices(coin, price)
         for chat_id in bot.auth_users:
             bot.sendText(f"{shortened_coin} price is currently {price} USD", chat_id)
