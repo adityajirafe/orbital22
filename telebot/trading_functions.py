@@ -3,20 +3,42 @@ import pandas as pd
 from FTXAPI import FtxClient
 import talib as ta
 
-def trading_algo(bot, coins, interval, ftx):
+def shortform(coin: str):
+    count = 0
+    for letter in coin:
+        if letter == "-":
+            break
+        else:
+            count+= 1
+    return coin[0:count]
+
+def trading_algo(bot, coins, interval):
     # trivial check to skip if no users logged in
-    if bot.auth_users == []:
+    if bot.auth_users == {}:
         return
     # run for one coin first -> BTC
-    coin = coins[0]
-    suggested_trade = detect_trade(bot, coin, interval, ftx)
-    for chat_id in bot.auth_users:
-        bot.sendText(f"BTC price is currently {suggested_trade['price']} USD", chat_id)
-        bot.sendImage("graph.png", chat_id)
-        bot.sendText(
-            f"Favoured trade: {suggested_trade['type']} at {suggested_trade['price']}",
-            chat_id
-        )
+    for coin in coins:
+        shortened_coin = shortform(coin)
+        temp_chat_id = list(bot.auth_users.keys())[0]
+        ftx = bot.auth_users[temp_chat_id]
+        suggested_trade = detect_trade(bot, coin, interval, ftx)
+        price = suggested_trade['price']
+        bot.update_coin_prices(coin, price)
+        for chat_id in bot.auth_users:
+            bot.sendText(f"{shortened_coin} price is currently {price} USD", chat_id)
+            bot.sendImage("graph.png", chat_id)
+            if (suggested_trade['type'] == 'FAVOUR_LONG'):
+                bot.sendText(
+                    f"Favoured trade: {suggested_trade['type']} at {price}\n\n/long_trade_{shortened_coin}\n\n/no_trade",
+                    chat_id
+                )
+            elif (suggested_trade['type'] == 'FAVOUR_SHORT'):
+                bot.sendText(
+                    f"Favoured trade: {suggested_trade['type']} at {price}\n\n/short_trade_{shortened_coin}\n\n/no_trade",
+                    chat_id
+                )
+            elif (suggested_trade['type'] == 'NO_TRADE'):
+                bot.sendText(f"no trade detected for {shortened_coin}")
 
 """To plot the graph of specified coin and save it"""
 def plot_and_save(coin: str, interval: str, ftx: FtxClient):

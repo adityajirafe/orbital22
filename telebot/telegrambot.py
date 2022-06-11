@@ -7,7 +7,8 @@ class TelegramBot:
         self.botToken = botToken
         # self.initialised = False
         self.chatids = {}
-        self.auth_users = []
+        self.auth_users = {}
+        self.prices = {}
 
     def TelebotPoll(self, waitTime: int):
 
@@ -58,9 +59,13 @@ class TelegramBot:
         except:
             print("Failed to send Image")
 
-    def authenticate_user(self, chat_id):
-        self.auth_users.append(chat_id)
+    def authenticate_user(self, chat_id, ftxobj):
+        self.auth_users[chat_id] = ftxobj
+        print(self.auth_users)
         
+    def update_coin_prices(self, coin, price):
+        self.prices[coin] = price
+        print(self.prices)
 
     # def initialise_bot(self):
     #     self.initalised = True
