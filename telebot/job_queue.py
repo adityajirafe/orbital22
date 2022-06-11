@@ -2,6 +2,11 @@ from job import Jobs
 from functions import *
 
 from firebaseconfig import login
+# temporary import ftxapi until we figure out how to pull ftxobj from firestore
+from FTXAPI import FtxClient
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 users = []
 
@@ -32,8 +37,11 @@ class JobQueue:
                     handle_start(job_item, self.bot)
                     self.waiting.update({f'{job_item.chat_id}': {'job': Jobs.USERNAME}})
                     self.queue.remove(job_item)
-                elif job_item.job is Jobs.TRADE:
-                    handle_trade(job_item, self.bot)
+                elif job_item.job is Jobs.LONGTRADE:
+                    handle_long_trade(job_item, self.bot)
+                    self.queue.remove(job_item)
+                elif job_item.job is Jobs.SHORTTRADE:
+                    handle_short_trade(job_item, self.bot)
                     self.queue.remove(job_item)
                 elif job_item.job is Jobs.NO_TRADE:
                     handle_no_trade(job_item, self.bot)
@@ -65,14 +73,21 @@ class JobQueue:
                 elif job is Jobs.PASSWORD:
                     password = handle_password(job_item, self.bot)
                     users.append([self.waiting[chat_id]['username'], password])
-                    
+
                     if (login(self.waiting[chat_id]['username'], password, self.auth)):
                         # Mark user as aunthenticated so they can receive trade suggestions
-                        self.bot.authenticate_user(chat_id)
+                        # need to call/create the ftx object here using the email/username/chatid as the key, 
+                        # and the ftx info as the value, from firestore
+                        FTX_API_KEY = os.getenv('FtxApiKey')
+                        FTX_API_SECRET = os.getenv('FtxApiSecret')
+                        ftxobj = FtxClient(api_key= FTX_API_KEY, api_secret= FTX_API_SECRET)
+                        
+                        self.bot.authenticate_user(chat_id, ftxobj)
                         self.bot.sendText(
                             "Log in successful! \nYou will now begin to receive trade suggestions",
                             chat_id
                         )
+
                     else: 
                         self.bot.sendText(
                             "User not found. Press /start to restart bot\nNew users head to the CoinValet App to sign up!", 

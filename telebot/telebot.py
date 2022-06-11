@@ -21,8 +21,16 @@ FTX_API_SECRET = os.getenv('FtxApiSecret')
 def initialisation():
     return TelegramBot(TOKEN)
     
+def shortform(coin: str):
+    count = 0
+    for letter in coin:
+        if letter == "-":
+            break
+        else:
+            count+= 1
+    return coin[0:count]
 
-def main():
+def main(coins):
     
     while True:
         try:
@@ -33,7 +41,9 @@ def main():
                 name = input['first_name']
                 print(input)
                 pending_job = None
-
+                
+                coin = coins[0]
+                shortened_coin = shortform(coin)
                 if (message == '/start'):
                     if (chat_id not in bot.chatids):
                         print(f'Starting new session for {chat_id}')
@@ -43,10 +53,14 @@ def main():
                     
                 # elif bot.initialsed == True:
                 
-                elif (message == '/trade'):
-                    pending_job = Job_Item(chat_id, message, Jobs.TRADE)
+                elif (message == f'/long_trade_{shortened_coin}'):
+                    pending_job = Job_Item(chat_id, message, Jobs.LONGTRADE, coin)
+
+                elif (message == f'/short_trade_{shortened_coin}'):
+                    pending_job = Job_Item(chat_id, message, Jobs.SHORTTRADE, coin)
+                    print("short trade job item created")
                 
-                elif (message == '/notrade'):
+                elif (message == '/no_trade'):
                     pending_job = Job_Item(chat_id, message, Jobs.NO_TRADE)
 
                 elif job_queue.is_valid_input(chat_id):
@@ -64,7 +78,7 @@ def main():
                     pending_job = None
 
             job_queue.execute()
-            trading_algo(bot, coins, interval, ftx)
+            trading_algo(bot, coins, interval)
         except:
             print("ERROR in Main Loop")
             sleep(10)
@@ -91,5 +105,5 @@ if __name__ == '__main__':
     """Initialise the Job Queue"""
     job_queue = JobQueue(bot, user_db, user_auth)
 
-    main()
+    main(coins)
 
