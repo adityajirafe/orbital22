@@ -21,15 +21,6 @@ FTX_API_SECRET = os.getenv('FtxApiSecret')
 def initialisation():
     return TelegramBot(TOKEN)
     
-def shortform(coin: str):
-    count = 0
-    for letter in coin:
-        if letter == "-":
-            break
-        else:
-            count+= 1
-    return coin[0:count]
-
 def main(coins):
     
     while True:

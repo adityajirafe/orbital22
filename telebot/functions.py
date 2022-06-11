@@ -20,11 +20,24 @@ def handle_password(job_item, bot):
     )
     return job_item.message
 
+# checks if there is enough money in the account given the amount required to make a trade
+def checkTrade(margin: float, ftx) -> bool:
+    s = ftx.get_balances()
+    if (s == []):
+        return False
+    balances = pd.data(s)
+    lst = balances.coin.tolist()
+    if ("USD" in lst):
+        index = lst.index("USD")
+        return balances.free[index] > margin
+    return False
+
 def handle_long_trade(job_item, bot):
     chat_id = job_item.chat_id
+    # retrieves the correct ftx object from the dictionary corresponding to the chat id
     ftx = bot.auth_users[chat_id]
+    # stored the specific coin in the job item
     coin = job_item.coin
-    print('inside open_long')
 
     if (checkTrade(1, ftx)):
         try:
@@ -38,22 +51,13 @@ def handle_long_trade(job_item, bot):
     print(job_item.message)
     return 
 
-def checkTrade(margin: float, ftx) -> bool:
-    s = ftx.get_balances()
-    if (s == []):
-        return False
-    balances = pd.data(s)
-    lst = balances.coin.tolist()
-    if ("USD" in lst):
-        index = lst.index("USD")
-        return balances.free[index] > margin
-    return False
-
 def handle_short_trade(job_item, bot):
     chat_id = job_item.chat_id
+    # retrieves the correct ftx object from the dictionary corresponding to the chat id
     ftx = bot.auth_users[chat_id]
+    # stored the specific coin in the job item
     coin = job_item.coin
-    print('inside open_short')
+
     if (checkTrade(1, ftx)):
         try:            
             ftx.place_order(market= coin, side= 'sell', price= str(bot.prices[coin]), type= 'limit', size= 0.001)
