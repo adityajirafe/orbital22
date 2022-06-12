@@ -6,29 +6,23 @@ import {
     Keyboard,
     KeyboardAvoidingView,
     Platform,
-    Alert
+    Alert,
 } from 'react-native';
 
 import { AuthTextInput, AuthPressable, FeatureImage } from '../components';
 import { auth } from '../firebase';
 import { globalStyles } from '../styles/Styles';
 
-
 const AuthScreen = () => {
-    
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const missingFieldsAlert = () => {
-        Alert.alert(
-            'Missing fields, please try again!',
-        );
+        Alert.alert('Missing fields, please try again!');
     };
-    
+
     const userNotFoundAlert = () => {
-        Alert.alert(
-            'Error: User not found',
-        );
+        Alert.alert('Error: User not found');
     };
 
     const loginHandler = async () => {
@@ -40,12 +34,12 @@ const AuthScreen = () => {
         await signInWithEmailAndPassword(auth, email, password)
             .then((userCredentials) => {
                 const user = userCredentials.user;
-                
+
                 console.log(user);
 
                 restoreForm();
             })
-            .catch ((error) => {
+            .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
 
@@ -65,23 +59,26 @@ const AuthScreen = () => {
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : null}
-        >
-            <View style = {globalStyles.container}>
+            behavior={Platform.OS === 'ios' ? 'padding' : null}>
+            <View style={globalStyles.container}>
                 <FeatureImage />
                 <View style={globalStyles.container_auth}>
-                    <Text style={[globalStyles.welcomeText, globalStyles.boldText]}>
+                    <Text
+                        style={[
+                            globalStyles.welcomeText,
+                            globalStyles.boldText,
+                        ]}>
                         {`Log in to your CoinValet Account!`}
                     </Text>
                     <AuthTextInput
                         value={email}
-                        placeholder='Your Email'
+                        placeholder="Your Email"
                         textHandler={setEmail}
-                        keyboardType='email-address'
+                        keyboardType="email-address"
                     />
                     <AuthTextInput
                         value={password}
-                        placeholder='Your Password'
+                        placeholder="Your Password"
                         textHandler={setPassword}
                         secureTextEntry
                     />
@@ -90,11 +87,10 @@ const AuthScreen = () => {
                         title={'LOG IN'}
                     />
                 </View>
-                <View style ={globalStyles.blankContainer}></View>
+                <View style={globalStyles.blankContainer}></View>
             </View>
         </KeyboardAvoidingView>
     );
 };
 
 export default AuthScreen;
-

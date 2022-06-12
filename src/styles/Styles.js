@@ -1,25 +1,25 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 export const globalStyles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: '#c8dfe4',
+        flex: 1,
+        backgroundColor: '#c8dfe4',
     },
     blankContainer: {
-      flex: 0.5,
-      backgroundColor: '#c8dfe4',
+        flex: 0.5,
+        backgroundColor: '#c8dfe4',
     },
     container_auth: {
-      backgroundColor: '#c8dfe4',
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center'
+        backgroundColor: '#c8dfe4',
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     main: {
-      flex: 1,
-      backgroundColor: '#fff',
-      alignContent: 'center',
-      alignItems: 'center',
+        flex: 1,
+        backgroundColor: '#fff',
+        alignContent: 'center',
+        alignItems: 'center',
     },
     title: {
         textAlign: 'center',
@@ -29,7 +29,7 @@ export const globalStyles = StyleSheet.create({
         fontWeight: 'bold',
     },
     boldText: {
-      fontFamily: 'roboto-bold'
+        fontFamily: 'roboto-bold',
     },
     coinValet_title: {
         fontFamily: 'advent',
@@ -37,13 +37,13 @@ export const globalStyles = StyleSheet.create({
         color: 'black',
     },
     welcomeText: {
-      fontSize: 20,
-      textAlign: 'center',
-      marginBottom: 20,
-      fontFamily: 'roboto-bold'
+        fontSize: 20,
+        textAlign: 'center',
+        marginBottom: 20,
+        fontFamily: 'roboto-bold',
     },
     text: {
-      fontFamily: 'roboto',
-      fontSize: 20
+        fontFamily: 'roboto',
+        fontSize: 20,
     },
-  });
+});
