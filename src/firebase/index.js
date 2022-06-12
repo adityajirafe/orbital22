@@ -2,7 +2,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getDatabase } from 'firebase/database';
-import { getFirestore } from 'firebase/firestore'
+import { getFirestore } from 'firebase/firestore';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -18,7 +18,7 @@ import {
     databaseURL,
 } from '@env';
 
-// Web app's Firebase configuration
+// Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: apiKey,
     authDomain: authDomain,
@@ -27,7 +27,7 @@ const firebaseConfig = {
     messagingSenderId: messagingSenderId,
     appId: appId,
     measurementId: measurementId,
-    databaseURL: databaseURL
+    databaseURL: databaseURL,
 };
 
 // Initialize Firebase

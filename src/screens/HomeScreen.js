@@ -6,17 +6,17 @@ import { FeatureImage } from '../components';
 
 const HomeScreen = ({ navigation }) => {
     return (
-        <View style = {globalStyles.container}>
+        <View style={globalStyles.container}>
             <FeatureImage />
-            <View style = {styles.login_container}>
+            <View style={styles.login_container}>
                 <TouchableOpacity onPress={() => navigation.navigate('auth')}>
-                    <Text style = {styles.button}>Login</Text>
+                    <Text style={styles.button}>Login</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('signup')}>
-                    <Text style = {styles.button}>Signup</Text>
+                    <Text style={styles.button}>Signup</Text>
                 </TouchableOpacity>
             </View>
-            <View style = {styles.empty}></View>
+            <View style={styles.empty}></View>
             <StatusBar style="auto" />
         </View>
     );
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     image: {
         width: '100%',
         height: '100%',
-        resizeMode: 'contain'
+        resizeMode: 'contain',
     },
     image_container: {
         flex: 1,
@@ -36,7 +36,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly',
         alignItems: 'center',
         // paddingTop: 40,
-        
     },
     button: {
         textAlign: 'center',
@@ -48,8 +47,8 @@ const styles = StyleSheet.create({
         width: 200,
     },
     empty: {
-        flex: 0.3
-    }
-})
+        flex: 0.3,
+    },
+});
 
 export default HomeScreen;

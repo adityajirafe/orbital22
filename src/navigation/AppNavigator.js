@@ -7,12 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 
-import { 
-    HomeScreen,
-    AuthScreen,
-    MainScreen,
-    SignupScreen
-} from '../screens';
+import { HomeScreen, AuthScreen, MainScreen, SignupScreen } from '../screens';
 
 import { globalStyles } from '../styles/Styles';
 
@@ -20,8 +15,8 @@ const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
 
 const AppNavigator = () => {
-
     const [isAuth, setIsAuth] = useState(false);
+    const [user, setUser] = useState('adi');
 
     useEffect(() => {
         const unsubscribeAuthStateChanged = onAuthStateChanged(
@@ -29,8 +24,11 @@ const AppNavigator = () => {
             (authenticatedUser) => {
                 if (authenticatedUser) {
                     setIsAuth(true);
+                    console.log('email is ' + authenticatedUser.email);
+                    setUser(authenticatedUser.email);
                 } else {
                     setIsAuth(false);
+                    setUser('');
                 }
             }
         );
@@ -48,54 +46,61 @@ const AppNavigator = () => {
             <Text>Logout</Text>
         </TouchableOpacity>
     );
-    
+
     const MainNavigator = () => (
-        <Stack.Navigator initialRouteName = "main">
-            <Stack.Screen 
-                name = "main"
-                options={{ title: 'Cytpo Trading Made Fun & Easy', 
-                    headerStyle: { backgroundColor: '#c8dfe4'} ,
-                    headerTitleStyle: {fontFamily: 'roboto-bold'},
+        <Stack.Navigator initialRouteName="main">
+            <Stack.Screen
+                name="main"
+                options={{
+                    title: 'Cytpo Trading Made Fun & Easy',
+                    headerStyle: { backgroundColor: '#c8dfe4' },
+                    headerTitleStyle: { fontFamily: 'roboto-bold' },
                 }}
-                component = {HomeScreen}
-                
-            />
-            <Stack.Screen 
-                name = "signup"
-                options={{ title: 'Signup', 
-                    headerStyle: { backgroundColor: '#c8dfe4'} ,
-                    headerTitleStyle: {fontFamily: 'roboto-bold'},
-                }}
-                component = {SignupScreen}
+                component={HomeScreen}
             />
             <Stack.Screen
-                name = "auth"
-                options={{ title: 'Login',
-                    headerStyle: { backgroundColor: '#c8dfe4'} ,
-                    headerTitleStyle: {fontFamily: 'roboto-bold'},
+                name="signup"
+                options={{
+                    title: 'Signup',
+                    headerStyle: { backgroundColor: '#c8dfe4' },
+                    headerTitleStyle: { fontFamily: 'roboto-bold' },
                 }}
-                component = {AuthScreen}
+                component={SignupScreen}
+            />
+            <Stack.Screen
+                name="auth"
+                options={{
+                    title: 'Login',
+                    headerStyle: { backgroundColor: '#c8dfe4' },
+                    headerTitleStyle: { fontFamily: 'roboto-bold' },
+                }}
+                component={AuthScreen}
             />
         </Stack.Navigator>
     );
 
+    const MainScreenWithUser = () => {
+        return <MainScreen username={user} />;
+    };
+
     const AuthMainNavigator = () => (
         <AuthStack.Navigator>
             <AuthStack.Screen
-                name = "login"
-                options={{ title: 'CoinValet',
-                    headerStyle: { backgroundColor: '#c8dfe4'} ,
-                    headerTitleStyle: {fontFamily: 'roboto-bold'},
+                name="login"
+                options={{
+                    title: 'CoinValet',
+                    headerStyle: { backgroundColor: '#c8dfe4' },
+                    headerTitleStyle: { fontFamily: 'roboto-bold' },
                     headerRight: () => <LogoutIcon />,
-                    }}
-                component = { MainScreen }
-            /> 
+                }}
+                component={MainScreenWithUser}
+            />
         </AuthStack.Navigator>
     );
 
     return (
         <NavigationContainer>
-            { isAuth ? <AuthMainNavigator /> : <MainNavigator /> }
+            {isAuth ? <AuthMainNavigator /> : <MainNavigator />}
             <StatusBar style="auto" />
         </NavigationContainer>
     );
