@@ -21,17 +21,18 @@ const useConstructor = (callBack = () => {}) => {
 const MainScreen = (props) => {
     const { username } = props;
     const [trades, setTrades] = useState([]);
-    // console.log(username);
     useConstructor(() => {
         // console.log('Rendering screen now');
-        const docRef = collection(fs, 'UserPortfolio/tom/trades');
+        // Demo Account contains empty trades while username loads
+        const reference = username
+            ? `UserPortfolio/${username}/trades`
+            : 'UserPortfolio/demo/trades';
+        const docRef = collection(fs, reference);
         getDocs(docRef).then((doc) => {
             doc.forEach((docu) => {
                 // console.log(docu.data());
                 let trade = docu.data();
-                console.log(trade);
                 setTrades((trades) => [...trades, trade]);
-                console.log(trades);
             });
         });
     });
@@ -44,7 +45,7 @@ const MainScreen = (props) => {
         biggestWinner,
         biggestLoser,
     } = METRICS[0];
-    console.log(trades);
+    // console.log(trades);
     return (
         <View style={globalStyles.container}>
             <View style={styles.trades}>
