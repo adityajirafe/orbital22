@@ -26,6 +26,9 @@ const SignupScreen = () => {
     const [users, setUsers] = useState([]);
     useConstructor(() => {
         console.log('Rendering screen now');
+
+        // addDummyData('adi@gmail.com');
+
         // Original method to get data using listener
         // const subscriber = onSnapshot(doc(fs, 'Directory/', 'Users'), (doc) => {
         //     let persons = doc.data();

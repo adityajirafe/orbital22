@@ -18,8 +18,11 @@ const createTradeTemplate = (username) => {
 };
 
 // export const addDummyData = (email) => {
-//     const trades = TRADES[8];
-//     const tradeRef = doc(collection(fs, 'UserPortfolio', email, 'trades'));
-//     setDoc(tradeRef, trades);
-//     console.log('added');
+//     let len = TRADES.length;
+//     for (let i = 0; i < len; i++) {
+//         const trades = TRADES[i];
+//         const tradeRef = doc(collection(fs, 'UserPortfolio', email, 'trades'));
+//         setDoc(tradeRef, trades);
+//         console.log('added');
+//     }
 // };

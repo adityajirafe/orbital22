@@ -16,7 +16,7 @@ const AuthStack = createNativeStackNavigator();
 
 const AppNavigator = () => {
     const [isAuth, setIsAuth] = useState(false);
-    const [user, setUser] = useState('adi');
+    const [user, setUser] = useState('demo');
 
     useEffect(() => {
         const unsubscribeAuthStateChanged = onAuthStateChanged(
