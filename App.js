@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import React, { useState, useEffect, useCallback, Component } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, LogBox } from 'react-native';
 
 import AppNavigator from './src/navigation/AppNavigator';

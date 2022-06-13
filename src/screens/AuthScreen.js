@@ -25,6 +25,10 @@ const AuthScreen = () => {
         Alert.alert('Error: User not found');
     };
 
+    const incorrectPasswordAlert = () => {
+        Alert.alert('Error: Incorrect Password');
+    };
+
     const loginHandler = async () => {
         if (email.length === 0 || password.length < 6) {
             missingFieldsAlert();
@@ -46,6 +50,8 @@ const AuthScreen = () => {
                 console.error('[loginHandler]', errorCode, errorMessage);
                 if (errorCode == 'auth/user-not-found') {
                     userNotFoundAlert();
+                } else if (errorCode == 'auth/wrong-password') {
+                    incorrectPasswordAlert();
                 }
             });
     };
