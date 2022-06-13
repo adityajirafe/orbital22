@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { COLOURS } from '../styles/Colours';
 
 const DashBoardItem = (props) => {
     const { heading, text } = props;
@@ -21,12 +22,11 @@ const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
         borderWidth: 10,
-        borderColor: '#c8dfe4',
+        borderColor: COLOURS.background,
     },
     row: {
         flex: 1,
         padding: 0,
-        // alignContent: 'center',
         alignItems: 'center',
         padding: 10,
     },
@@ -34,16 +34,18 @@ const styles = StyleSheet.create({
         fontFamily: 'roboto-bold',
         fontSize: 18,
         flex: 1,
+        color: COLOURS.white,
     },
     text: {
         fontFamily: 'roboto',
         fontSize: 15,
         flex: 1,
+        color: COLOURS.white,
     },
     green: {
-        color: 'green',
+        color: COLOURS.green,
     },
     boxColour: {
-        backgroundColor: 'lightblue',
+        backgroundColor: COLOURS.secondary,
     },
 });

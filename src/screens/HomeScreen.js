@@ -3,17 +3,22 @@ import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { globalStyles } from '../styles/Styles';
 import { FeatureImage } from '../components';
+import { COLOURS } from '../styles/Colours';
 
 const HomeScreen = ({ navigation }) => {
     return (
         <View style={globalStyles.container}>
             <FeatureImage />
             <View style={styles.login_container}>
-                <TouchableOpacity onPress={() => navigation.navigate('auth')}>
-                    <Text style={styles.button}>Login</Text>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('auth')}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('signup')}>
-                    <Text style={styles.button}>Signup</Text>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('signup')}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>Register</Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.empty}></View>
@@ -35,17 +40,20 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        // paddingTop: 40,
     },
     button: {
+        borderRadius: 20,
+        backgroundColor: COLOURS.secondary,
+    },
+    buttonText: {
         textAlign: 'center',
         fontFamily: 'roboto-bold',
-        fontSize: 32,
-        borderColor: '#FEFFED',
-        borderWidth: 10,
-        backgroundColor: '#FEFFED',
+        fontSize: 30,
+        borderWidth: 2,
         width: 200,
-        borderRadius: 20
+        height: 50,
+        borderRadius: 20,
+        color: COLOURS.darkGrey,
     },
     empty: {
         flex: 0.3,

@@ -1,10 +1,15 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { COLOURS } from '../styles/Colours';
+import { globalStyles } from '../styles/Styles';
 
 const NoTradeItem = () => {
+    const introMessage =
+        'Proceed to the CoinValet Telegram Bot\n to make some trades!';
     return (
         <View style={styles.mainContainer}>
-            <Text>No Trades Found</Text>
+            <Text style={styles.text}>No Trades Found</Text>
+            <Text style={styles.paragraph}>{introMessage}</Text>
         </View>
     );
 };
@@ -14,32 +19,20 @@ export default NoTradeItem;
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        backgroundColor: 'white',
-    },
-    row: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        padding: 20,
-    },
-    coin: {
-        fontFamily: 'roboto-bold',
-        fontSize: 20,
-        flex: 1,
-    },
-    odd: {
-        backgroundColor: '#eeeeee',
-    },
-    even: {
-        backgroundColor: '#afafaf',
+        backgroundColor: COLOURS.secondary,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     text: {
-        fontFamily: 'roboto',
-        fontSize: 15,
-        flex: 1,
-        justifyContent: 'space-evenly',
+        color: COLOURS.white,
+        fontFamily: 'roboto-bold',
+        fontSize: 22,
     },
-    green: {
-        color: 'green',
+    paragraph: {
+        paddingTop: 40,
+        color: COLOURS.white,
+        fontFamily: 'roboto',
+        textAlign: 'center',
+        fontSize: 16,
     },
 });

@@ -133,7 +133,7 @@ const SignupScreen = () => {
             behavior={Platform.OS === 'ios' ? 'padding' : null}>
             <View style={globalStyles.container}>
                 <FeatureImage />
-                <View style={globalStyles.container_auth}>
+                <View style={globalStyles.container_signup}>
                     <Text
                         style={[
                             globalStyles.welcomeText,
