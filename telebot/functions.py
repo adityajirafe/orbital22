@@ -42,7 +42,7 @@ def handle_long_trade(job_item, bot):
     if (checkTrade(1, ftx)):
         try:
             ftx.place_order(market= coin, side= 'buy', price= str(bot.prices[coin]), type= 'limit', size= 0.001)
-            bot.sendText(f"Long trade has been taken\nat {bot.prices[coin]}", chat_id)
+            bot.sendText(f"Long trade has been taken\n{coin} at {bot.prices[coin]}", chat_id)
             # update position here
         except:
             bot.sendText( "some other error occured", chat_id)
@@ -61,14 +61,16 @@ def handle_short_trade(job_item, bot):
     if (checkTrade(1, ftx)):
         try:            
             ftx.place_order(market= coin, side= 'sell', price= str(bot.prices[coin]), type= 'limit', size= 0.001)
-            bot.sendText(f"Short trade has been taken\nat {bot.prices[coin]}", chat_id)
+            bot.sendText(f"Short trade has been taken\n{coin} at {bot.prices[coin]}", chat_id)
             # update position here
         except:
             bot.sendText( "some other error occured", chat_id)
     else:
-        bot.sendText("not enough money to make the trade", chat_id)
+        bot.sendText(f"not enough money to make the trade for {coin}", chat_id)
         print("no money")
 
+    # ftx.place_order(market= coin, side= 'sell', price= str(bot.prices[coin]), type= 'limit', size= 0.001)
+    # bot.sendText(f"Short trade has been taken\n{coin} at {bot.prices[coin]}", chat_id)
     print(job_item.message)
     return 
 
