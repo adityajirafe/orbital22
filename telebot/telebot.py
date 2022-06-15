@@ -25,51 +25,54 @@ def main(coins):
     
     while True:
         try:
-            result = bot.TelebotPoll(10)
-            for input in result:
-                message = input['message']
-                chat_id = input['chat_id']
-                name = input['first_name']
-                print(input)
-                pending_job = None
-                
-                coin = coins[0]
-                shortened_coin = shortform(coin)
-                if (message == '/start'):
-                    if (chat_id not in bot.chatids):
-                        print(f'Starting new session for {chat_id}')
-                        bot.chatids.update({chat_id : name})
-                    
-                    pending_job = Job_Item(chat_id, message, Jobs.START)
-                    
-                # elif bot.initialsed == True:
-                
-                elif (message == f'/long_trade_{shortened_coin}'):
-                    pending_job = Job_Item(chat_id, message, Jobs.LONGTRADE, coin)
-
-                elif (message == f'/short_trade_{shortened_coin}'):
-                    pending_job = Job_Item(chat_id, message, Jobs.SHORTTRADE, coin)
-                    print("short trade job item created")
-                
-                elif (message == '/no_trade'):
-                    pending_job = Job_Item(chat_id, message, Jobs.NO_TRADE)
-
-                elif job_queue.is_valid_input(chat_id):
-                    pending_job = Job_Item(chat_id, message, Jobs.USERNAME)
-                
-                else:
-                    bot.sendText(
-                        "Invalid input, press /start to use CoinValet or use another valid prompt",
-                        chat_id
-                    )
-                    continue
-
-                if pending_job:
-                    job_queue.push_job(pending_job)
+            
+            for coin in coins:
+                result = bot.TelebotPoll(10)
+                for input in result:
+                    message = input['message']
+                    chat_id = input['chat_id']
+                    name = input['first_name']
+                    print(input)
                     pending_job = None
+                    
+                    # coin = coins[0]
+                    shortened_coin = shortform(coin)
+                    if (message == '/start'):
+                        if (chat_id not in bot.chatids):
+                            print(f'Starting new session for {chat_id}')
+                            bot.chatids.update({chat_id : name})
+                        
+                        pending_job = Job_Item(chat_id, message, Jobs.START)
+                        
+                    # elif bot.initialsed == True:
+                    
+                    elif (message == f'/long_trade_{shortened_coin}'):
+                        pending_job = Job_Item(chat_id, message, Jobs.LONGTRADE, coin)
 
-            job_queue.execute()
-            trading_algo(bot, coins, interval)
+                    elif (message == f'/short_trade_{shortened_coin}'):
+                        pending_job = Job_Item(chat_id, message, Jobs.SHORTTRADE, coin)
+                        print("short trade job item created")
+                    
+                    elif (message == '/no_trade'):
+                        pending_job = Job_Item(chat_id, message, Jobs.NO_TRADE)
+
+                    elif job_queue.is_valid_input(chat_id):
+                        pending_job = Job_Item(chat_id, message, Jobs.USERNAME)
+                    
+                    else:
+                        bot.sendText(
+                            "Invalid input, press /start to use CoinValet or use another valid prompt",
+                            chat_id
+                        )
+                        continue
+
+                    if pending_job:
+                        job_queue.push_job(pending_job)
+                        pending_job = None
+
+                job_queue.execute()
+                trading_algo(bot, coin, interval)
+                
         except:
             print("ERROR in Main Loop")
             sleep(10)
@@ -78,7 +81,7 @@ def main(coins):
 
 
 if __name__ == '__main__':
-    coins = ['RUNE-PERP']
+    coins = ['RUNE-PERP', 'ETH-PERP']
     interval = '1h'
 
     site = f'https://api.telegram.org/bot{TOKEN}/getUpdates'
