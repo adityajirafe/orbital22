@@ -5,6 +5,9 @@ export { default as CoinValetIcon } from './CoinValetIcon';
 
 export { default as TradeItem } from './TradeItem';
 export { default as NoTradeItem } from './NoTradeItem';
+export { default as DashBoard } from './DashBoard';
 export { default as DashBoardItem } from './DashBoardItem';
+export { default as PositionList } from './PositionList';
+export { default as Position } from './Position';
 
 export { default as CustomDrawerContent } from './CustomDrawerContent';

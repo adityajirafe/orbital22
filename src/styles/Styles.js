@@ -57,4 +57,10 @@ export const globalStyles = StyleSheet.create({
     logoutIcon: {
         paddingRight: 10,
     },
+    odd: {
+        backgroundColor: COLOURS.lightGrey,
+    },
+    even: {
+        backgroundColor: COLOURS.darkGrey,
+    },
 });

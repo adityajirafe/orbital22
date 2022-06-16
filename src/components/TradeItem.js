@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { COLOURS } from '../styles/Colours';
+import { globalStyles } from '../styles/Styles';
 
 const TradeItem = (props) => {
     const { item, index } = props;
@@ -9,7 +10,7 @@ const TradeItem = (props) => {
             <View
                 style={[
                     styles.rowTop,
-                    index % 2 == 0 ? styles.even : styles.odd,
+                    index % 2 == 0 ? globalStyles.even : globalStyles.odd,
                 ]}>
                 <Text style={styles.coin}>{item.coin}</Text>
                 <Text style={styles.text}>{item.name}</Text>
@@ -18,7 +19,7 @@ const TradeItem = (props) => {
             <View
                 style={[
                     styles.rowBottom,
-                    index % 2 == 0 ? styles.even : styles.odd,
+                    index % 2 == 0 ? globalStyles.even : globalStyles.odd,
                 ]}>
                 <Text style={styles.text}>Units: {'\n' + item.units}</Text>
                 <Text style={styles.text}>Price: {'\n' + item.price}</Text>
@@ -62,12 +63,6 @@ const styles = StyleSheet.create({
         fontFamily: 'roboto-bold',
         fontSize: 24,
         flex: 1,
-    },
-    odd: {
-        backgroundColor: COLOURS.lightGrey,
-    },
-    even: {
-        backgroundColor: COLOURS.darkGrey,
     },
     text: {
         fontFamily: 'roboto',

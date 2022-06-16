@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { COLOURS } from '../styles/Colours';
-import { globalStyles } from '../styles/Styles';
 
 const NoTradeItem = () => {
     const introMessage =
