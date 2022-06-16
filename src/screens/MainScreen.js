@@ -38,28 +38,26 @@ const MainScreen = (props) => {
 
     return (
         <View style={globalStyles.container}>
-            <View style={styles.trades}>
-                <View style={styles.tradeListContainer}>
-                    {trades.length == 0 ? (
-                        <NoTradeItem style={styles.tradeList} />
-                    ) : (
-                        <FlatList
-                            style={styles.tradeList}
-                            data={trades.sort((a, b) =>
-                                compareTime(a.time, b.time)
-                            )}
-                            renderItem={({ item, index }) => {
-                                return (
-                                    <TradeItem
-                                        item={item}
-                                        index={index}
-                                        style={styles.tradeItem}
-                                    />
-                                );
-                            }}
-                        />
-                    )}
-                </View>
+            <View style={styles.tradeListContainer}>
+                {trades.length == 0 ? (
+                    <NoTradeItem style={styles.tradeList} />
+                ) : (
+                    <FlatList
+                        style={styles.tradeList}
+                        data={trades.sort((a, b) =>
+                            compareTime(a.time, b.time)
+                        )}
+                        renderItem={({ item, index }) => {
+                            return (
+                                <TradeItem
+                                    item={item}
+                                    index={index}
+                                    style={styles.tradeItem}
+                                />
+                            );
+                        }}
+                    />
+                )}
             </View>
             <StatusBar style="auto" />
         </View>
@@ -82,9 +80,6 @@ const styles = StyleSheet.create({
     tradeList: {
         flex: 1,
         backgroundColor: COLOURS.secondary,
-    },
-    trades: {
-        flex: 1,
     },
     tradeEntry: {
         padding: 20,

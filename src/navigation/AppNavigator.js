@@ -121,23 +121,6 @@ const AppNavigator = () => {
                 }}
                 drawerContent={(props) => <CustomDrawerContent {...props} />}>
                 <Drawer.Screen
-                    name="history"
-                    options={{
-                        title: 'Trade History',
-                        headerStyle: { backgroundColor: COLOURS.background },
-                        headerTitleStyle: { fontFamily: 'roboto-bold' },
-                        headerRight: () => <LogoutIcon />,
-                        drawerIcon: () => (
-                            <Icon
-                                name="clipboard-text-clock"
-                                size={22}
-                                style={{ marginRight: -20 }}
-                            />
-                        ),
-                    }}>
-                    {(props) => <MainScreenWithUser {...props} />}
-                </Drawer.Screen>
-                <Drawer.Screen
                     name="metrics"
                     options={{
                         title: 'Portfolio',
@@ -153,6 +136,23 @@ const AppNavigator = () => {
                         ),
                     }}>
                     {(props) => <PortfolioScreenWithUser {...props} />}
+                </Drawer.Screen>
+                <Drawer.Screen
+                    name="history"
+                    options={{
+                        title: 'Trade History',
+                        headerStyle: { backgroundColor: COLOURS.background },
+                        headerTitleStyle: { fontFamily: 'roboto-bold' },
+                        headerRight: () => <LogoutIcon />,
+                        drawerIcon: () => (
+                            <Icon
+                                name="clipboard-text-clock"
+                                size={22}
+                                style={{ marginRight: -20 }}
+                            />
+                        ),
+                    }}>
+                    {(props) => <MainScreenWithUser {...props} />}
                 </Drawer.Screen>
             </Drawer.Navigator>
         );
