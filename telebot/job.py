@@ -7,3 +7,4 @@ class Jobs(Enum):
     LONGTRADE = 4
     SHORTTRADE = 5
     NO_TRADE = 6
+    LOGOUT = 7

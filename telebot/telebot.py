@@ -42,18 +42,21 @@ def main():
                         bot.chatids.update({chat_id : name})
                     
                     pending_job = Job_Item(chat_id, message, Jobs.START)
-                
-                elif (message.startswith('/long_trade')):
+
+                elif (message.startswith('/long_trade') and chat_id in bot.auth_users):
                     current_coin = message.split('_')[2]
                     pending_job = Job_Item(chat_id, message, Jobs.LONGTRADE, current_coin)
 
-                elif (message.startswith('/short_trade')):
+                elif (message.startswith('/short_trade') and chat_id in bot.auth_users):
                     current_coin = message.split('_')[2]
                     pending_job = Job_Item(chat_id, message, Jobs.SHORTTRADE, current_coin)
                     print("short trade job item created")
                 
-                elif (message == '/no_trade'):
+                elif (message == '/no_trade' and chat_id in bot.auth_users):
                     pending_job = Job_Item(chat_id, message, Jobs.NO_TRADE)
+
+                elif (message == '/logout' and chat_id in bot.auth_users):
+                    pending_job = Job_Item(chat_id, message, Jobs.LOGOUT)
 
                 elif job_queue.is_valid_input(chat_id):
                     pending_job = Job_Item(chat_id, message, Jobs.USERNAME)

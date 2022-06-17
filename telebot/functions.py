@@ -21,6 +21,19 @@ def handle_password(job_item, bot):
     )
     return job_item.message
 
+def handle_logout(job_item, bot):
+    chat_id = job_item.chat_id
+    del bot.auth_users[chat_id]
+    bot.sendText(
+        "You have successfully logged out.",
+        chat_id
+    )
+    bot.sendText(
+        "Press /start to restart CoinValet",
+        chat_id
+    )
+    return
+
 # checks if there is enough money in the account given the amount required to make a trade
 def checkTrade(margin: float, ftx) -> bool:
     s = ftx.get_balances()

@@ -48,6 +48,9 @@ class JobQueue:
                 elif job_item.job is Jobs.NO_TRADE:
                     handle_no_trade(job_item, self.bot)
                     self.queue.remove(job_item)
+                elif job_item.job is Jobs.LOGOUT:
+                    handle_logout(job_item, self.bot)
+                    self.queue.remove(job_item)
                 else:
                     break
         except:
