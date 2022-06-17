@@ -23,6 +23,14 @@ def trading_algo(bot, coin, interval, ftx):
     # temp_chat_id = list(bot.auth_users.keys())[0]
     # gets the ftx object tagged to that chat id
     # ftx = bot.auth_users[temp_chat_id]
+
+    active_users = list(bot.auth_users.keys())
+    for user in bot.sleep:
+        if user in active_users:
+            active_users.remove(user)
+    
+    if active_users == []:
+        return
     
     suggested_trade = detect_trade(bot, coin, interval, ftx)
     price = suggested_trade['price']
@@ -30,7 +38,7 @@ def trading_algo(bot, coin, interval, ftx):
     # store the coin and its price in the dictionary to be accessed later on
     bot.update_coin_prices(coin, price)
     
-    for chat_id in bot.auth_users:
+    for chat_id in active_users:
         bot.sendImage(f"{coin}.png", chat_id)
         if (suggested_trade['type'] == 'LONG'):
             bot.sendText(

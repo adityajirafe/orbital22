@@ -8,3 +8,5 @@ class Jobs(Enum):
     SHORTTRADE = 5
     NO_TRADE = 6
     LOGOUT = 7
+    SLEEP = 8
+    LISTEN = 9
