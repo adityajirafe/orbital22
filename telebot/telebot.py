@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from FTXAPI import FtxClient
 from time import sleep
 from dotenv import load_dotenv
@@ -21,57 +22,66 @@ FTX_API_SECRET = os.getenv('FtxApiSecret')
 def initialisation():
     return TelegramBot(TOKEN)
     
-def main(coins):
-    
+def main():
+    time = datetime.now()
+    coin_count = 0
+    num_coins = len(coins)
     while True:
         try:
-            
-            for coin in coins:
-                result = bot.TelebotPoll(10)
-                for input in result:
-                    message = input['message']
-                    chat_id = input['chat_id']
-                    name = input['first_name']
-                    print(input)
+            result = bot.TelebotPoll(10)
+            for input in result:
+                message = input['message']
+                chat_id = input['chat_id']
+                name = input['first_name']
+                print(input)
+                pending_job = None
+                
+                if (message == '/start'):
+                    if (chat_id not in bot.chatids):
+                        print(f'Starting new session for {chat_id}')
+                        bot.chatids.update({chat_id : name})
+                    
+                    pending_job = Job_Item(chat_id, message, Jobs.START)
+                
+                elif (message.startswith('/long_trade')):
+                    current_coin = message.split('_')[2]
+                    pending_job = Job_Item(chat_id, message, Jobs.LONGTRADE, current_coin)
+
+                elif (message.startswith('/short_trade')):
+                    current_coin = message.split('_')[2]
+                    pending_job = Job_Item(chat_id, message, Jobs.SHORTTRADE, current_coin)
+                    print("short trade job item created")
+                
+                elif (message == '/no_trade'):
+                    pending_job = Job_Item(chat_id, message, Jobs.NO_TRADE)
+
+                elif job_queue.is_valid_input(chat_id):
+                    pending_job = Job_Item(chat_id, message, Jobs.USERNAME)
+                
+                else:
+                    bot.sendText(
+                        "Invalid input, press /start to use CoinValet or use another valid prompt",
+                        chat_id
+                    )
+                    continue
+
+                if pending_job:
+                    job_queue.push_job(pending_job)
                     pending_job = None
-                    
-                    # coin = coins[0]
-                    shortened_coin = shortform(coin)
-                    if (message == '/start'):
-                        if (chat_id not in bot.chatids):
-                            print(f'Starting new session for {chat_id}')
-                            bot.chatids.update({chat_id : name})
-                        
-                        pending_job = Job_Item(chat_id, message, Jobs.START)
-                        
-                    # elif bot.initialsed == True:
-                    
-                    elif (message == f'/long_trade_{shortened_coin}'):
-                        pending_job = Job_Item(chat_id, message, Jobs.LONGTRADE, coin)
 
-                    elif (message == f'/short_trade_{shortened_coin}'):
-                        pending_job = Job_Item(chat_id, message, Jobs.SHORTTRADE, coin)
-                        print("short trade job item created")
-                    
-                    elif (message == '/no_trade'):
-                        pending_job = Job_Item(chat_id, message, Jobs.NO_TRADE)
+            job_queue.execute()
+            current_time = datetime.now()
+        
+            if (current_time > (time + timedelta(minutes= trade_freq)) or coin_count != 0):
+                coin = coins[coin_count]
+                
+                if coin_count >= (num_coins - 1):
+                    coin_count = 0
+                else:
+                    coin_count+= 1
 
-                    elif job_queue.is_valid_input(chat_id):
-                        pending_job = Job_Item(chat_id, message, Jobs.USERNAME)
-                    
-                    else:
-                        bot.sendText(
-                            "Invalid input, press /start to use CoinValet or use another valid prompt",
-                            chat_id
-                        )
-                        continue
-
-                    if pending_job:
-                        job_queue.push_job(pending_job)
-                        pending_job = None
-
-                job_queue.execute()
-                trading_algo(bot, coin, interval)
+                time = current_time
+                trading_algo(bot, coin, interval, ftx)
                 
         except:
             print("ERROR in Main Loop")
@@ -81,7 +91,7 @@ def main(coins):
 
 
 if __name__ == '__main__':
-    coins = ['RUNE-PERP', 'ETH-PERP']
+    coins = ['RUNE-PERP', 'BTC-PERP']
     interval = '1h'
 
     site = f'https://api.telegram.org/bot{TOKEN}/getUpdates'
@@ -99,5 +109,8 @@ if __name__ == '__main__':
     """Initialise the Job Queue"""
     job_queue = JobQueue(bot, user_db, user_auth)
 
-    main(coins)
+    """Trade suggestion frequency (in minutes)"""
+    trade_freq = 0.2
+
+    main()
 
