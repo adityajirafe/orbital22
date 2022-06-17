@@ -34,6 +34,23 @@ def handle_logout(job_item, bot):
     )
     return
 
+def handle_sleep(job_item, bot):
+    chat_id = job_item.chat_id
+    bot.sleep.append(chat_id)
+    bot.sendText(
+        "Trade suggestions silenced. Press /listen to resume.",
+        chat_id
+    )
+    return
+
+def handle_listen(job_item, bot):
+    chat_id = job_item.chat_id
+    bot.sleep.remove(chat_id)
+    bot.sendText(
+        "Listening...",
+        chat_id
+    )
+
 # checks if there is enough money in the account given the amount required to make a trade
 def checkTrade(margin: float, ftx) -> bool:
     s = ftx.get_balances()

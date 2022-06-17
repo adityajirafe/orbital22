@@ -33,13 +33,15 @@ def main():
                 message = input['message']
                 chat_id = input['chat_id']
                 name = input['first_name']
-                print(input)
                 pending_job = None
                 
                 if (message == '/start'):
-                    if (chat_id not in bot.chatids):
-                        print(f'Starting new session for {chat_id}')
-                        bot.chatids.update({chat_id : name})
+                    
+                    if (chat_id in bot.sleep):
+                        bot.sleep.remove(chat_id)
+
+                    if (chat_id in bot.auth_users):
+                        del bot.auth_users[chat_id]
                     
                     pending_job = Job_Item(chat_id, message, Jobs.START)
 
@@ -54,6 +56,12 @@ def main():
                 
                 elif (message == '/no_trade' and chat_id in bot.auth_users):
                     pending_job = Job_Item(chat_id, message, Jobs.NO_TRADE)
+
+                elif (message == '/sleep' and chat_id in bot.auth_users):
+                    pending_job = Job_Item(chat_id, message, Jobs.SLEEP)
+
+                elif (message == '/listen' and chat_id in bot.auth_users):
+                    pending_job = Job_Item(chat_id, message, Jobs.LISTEN)
 
                 elif (message == '/logout' and chat_id in bot.auth_users):
                     pending_job = Job_Item(chat_id, message, Jobs.LOGOUT)

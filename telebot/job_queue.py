@@ -51,6 +51,12 @@ class JobQueue:
                 elif job_item.job is Jobs.LOGOUT:
                     handle_logout(job_item, self.bot)
                     self.queue.remove(job_item)
+                elif job_item.job is Jobs.SLEEP:
+                    handle_sleep(job_item, self.bot)
+                    self.queue.remove(job_item)
+                elif job_item.job is Jobs.LISTEN:
+                    handle_listen(job_item, self.bot)
+                    self.queue.remove(job_item)
                 else:
                     break
         except:

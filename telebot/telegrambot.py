@@ -8,6 +8,7 @@ class TelegramBot:
         self.chatids = {}
         self.auth_users = {}
         self.prices = {}
+        self.sleep = []
 
     def TelebotPoll(self, waitTime: int):
 
