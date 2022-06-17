@@ -17,6 +17,7 @@ telebot/mplfinance
 **/__pycache__
 .prettierrc
 *eslintrc.json
+ServiceAccountKey.json
 
 # macOS
 .DS_Store

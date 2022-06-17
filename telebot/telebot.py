@@ -55,6 +55,9 @@ def main():
                 elif (message == '/no_trade'):
                     pending_job = Job_Item(chat_id, message, Jobs.NO_TRADE)
 
+                elif (message == '/logout'):
+                    pending_job = Job_Item(chat_id, message, Jobs.LOGOUT)
+
                 elif job_queue.is_valid_input(chat_id):
                     pending_job = Job_Item(chat_id, message, Jobs.USERNAME)
                 
