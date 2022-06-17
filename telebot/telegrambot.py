@@ -1,7 +1,6 @@
 import requests
 from datetime import timedelta, datetime
 
-
 class TelegramBot:
     def __init__(self, botToken: str):
         self.botToken = botToken
@@ -62,6 +61,9 @@ class TelegramBot:
     def authenticate_user(self, chat_id, ftxobj):
         self.auth_users[chat_id] = ftxobj
         print(self.auth_users)
+
+    def store_email(self, chat_id, email):
+        self.chatids[chat_id] = email
         
     def update_coin_prices(self, coin, price):
         self.prices[coin] = price

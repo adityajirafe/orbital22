@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
-users = []
+# users = []
 
 class JobQueue:
     def __init__(self, bot, db, auth):
@@ -17,6 +17,8 @@ class JobQueue:
         self.auth = auth
         self.queue = []
         self.waiting = {}
+        # Default margin for trades 
+        self.margin = 1
 
     def push_job(self, job_item):
         self.queue.append(job_item)
@@ -38,10 +40,10 @@ class JobQueue:
                     self.waiting.update({f'{job_item.chat_id}': {'job': Jobs.USERNAME}})
                     self.queue.remove(job_item)
                 elif job_item.job is Jobs.LONGTRADE:
-                    handle_long_trade(job_item, self.bot)
+                    handle_long_trade(job_item, self.bot, self.margin)
                     self.queue.remove(job_item)
                 elif job_item.job is Jobs.SHORTTRADE:
-                    handle_short_trade(job_item, self.bot)
+                    handle_short_trade(job_item, self.bot, self.margin)
                     self.queue.remove(job_item)
                 elif job_item.job is Jobs.NO_TRADE:
                     handle_no_trade(job_item, self.bot)
@@ -72,9 +74,9 @@ class JobQueue:
                     return
                 elif job is Jobs.PASSWORD:
                     password = handle_password(job_item, self.bot)
-                    users.append([self.waiting[chat_id]['username'], password])
-
-                    if (login(self.waiting[chat_id]['username'], password, self.auth)):
+                    # users.append([self.waiting[chat_id]['username'], password])
+                    email = self.waiting[chat_id]['username']
+                    if (login(email, password, self.auth)):
                         # Mark user as aunthenticated so they can receive trade suggestions
                         # need to call/create the ftx object here using the email/username/chatid as the key, 
                         # and the ftx info as the value, from firestore
@@ -83,6 +85,7 @@ class JobQueue:
                         ftxobj = FtxClient(api_key= FTX_API_KEY, api_secret= FTX_API_SECRET)
                         
                         self.bot.authenticate_user(chat_id, ftxobj)
+                        self.bot.store_email(chat_id, email)
                         self.bot.sendText(
                             "Log in successful! \nYou will now begin to receive trade suggestions",
                             chat_id
@@ -97,7 +100,7 @@ class JobQueue:
                     del self.waiting[chat_id]
                     self.queue.remove(job_item)
 
-                    print(f"THE USERS ARE: {users}")
+                    # print(f"THE USERS ARE: {users}")
                     return
                 else:
                     continue

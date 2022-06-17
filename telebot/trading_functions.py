@@ -1,4 +1,5 @@
 import mplfinance as fplt
+import pathlib
 import pandas as pd
 from FTXAPI import FtxClient
 import talib as ta
@@ -12,34 +13,38 @@ def shortform(coin: str):
             count+= 1
     return coin[0:count]
 
-def trading_algo(bot, coin, interval):
+def trading_algo(bot, coin, interval, ftx):
     # trivial check to skip if no users logged in
     if bot.auth_users == {}:
         return
     # run for one coin first -> BTC
     shortened_coin = shortform(coin)
     # gets the first key of the dictionary which is a chat id
-    temp_chat_id = list(bot.auth_users.keys())[0]
+    # temp_chat_id = list(bot.auth_users.keys())[0]
     # gets the ftx object tagged to that chat id
-    ftx = bot.auth_users[temp_chat_id]
+    # ftx = bot.auth_users[temp_chat_id]
+    
     suggested_trade = detect_trade(bot, coin, interval, ftx)
     price = suggested_trade['price']
+    
     # store the coin and its price in the dictionary to be accessed later on
     bot.update_coin_prices(coin, price)
+    
     for chat_id in bot.auth_users:
         bot.sendImage(f"{coin}.png", chat_id)
-        if (suggested_trade['type'] == 'FAVOUR_LONG'):
+        if (suggested_trade['type'] == 'LONG'):
             bot.sendText(
                 f"{shortened_coin} price is currently {price} USD\nFavoured trade: {suggested_trade['type']} at {price} USD\n\n/long_trade_{shortened_coin}\n\n/no_trade",
                 chat_id
             )
-        elif (suggested_trade['type'] == 'FAVOUR_SHORT'):
+        elif (suggested_trade['type'] == 'SHORT'):
             bot.sendText(
                 f"{shortened_coin} price is currently {price} USD\nFavoured trade: {suggested_trade['type']} at {price} USD\n\n/short_trade_{shortened_coin}\n\n/no_trade",
                 chat_id
             )
         elif (suggested_trade['type'] == 'NO_TRADE'):
             bot.sendText(f"{shortened_coin} price is currently {price} USD\nno trade detected for {shortened_coin}")
+
 
 """To plot the graph of specified coin and save it"""
 def plot_and_save(coin: str, interval: str, ftx: FtxClient):
@@ -49,7 +54,7 @@ def plot_and_save(coin: str, interval: str, ftx: FtxClient):
     ap2 = [fplt.make_addplot(df['50EMA'], color='#180dad', panel= 1), 
             fplt.make_addplot(df['10EMA'], color='#ffff40', panel= 1),
             fplt.make_addplot(df['RSI'], color='#6a0dad', panel= 2)]
-    
+
     fplt.plot(
             df,
             type='candle',
@@ -60,6 +65,7 @@ def plot_and_save(coin: str, interval: str, ftx: FtxClient):
             addplot= ap2,
             savefig= f"{coin}.png" #change to coin name
     )
+
 
 """To pull data of specified coin from FTX API"""
 def getData(coin: str, time: str, ftx: FtxClient):
@@ -79,15 +85,15 @@ def getData(coin: str, time: str, ftx: FtxClient):
     df['10EMA'] = ta.EMA(df['close'], timeperiod = 10)
     return df
 
+
 """To detect potential trades"""
 def detect_trade(bot, coin, interval, ftx) -> dict:
     print(f'Detecting trades for {coin}')
 
     # try:
     df = getData(coin, interval, ftx)
-    print('a')
+
     plot_and_save(coin, interval, ftx)
-    print('b')
 
     last_entry_index = len(df) - 1
     price = df['close'][last_entry_index]
@@ -99,10 +105,10 @@ def detect_trade(bot, coin, interval, ftx) -> dict:
 
     if EMA_10 > EMA_50:
         print('detected favour long')
-        return {'type': "FAVOUR_LONG", 'price': price}
+        return {'type': "LONG", 'price': price}
     elif EMA_10 < EMA_50:
         print('detected favour short')
-        return {'type': "FAVOUR_SHORT", 'price': price}
+        return {'type': "SHORT", 'price': price}
     else: 
         print('detected no trade')
         return{'type': "NO_TRADE", 'price': price}
