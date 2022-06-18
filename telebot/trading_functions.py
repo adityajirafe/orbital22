@@ -1,17 +1,32 @@
 import mplfinance as fplt
-import pathlib
 import pandas as pd
 from FTXAPI import FtxClient
 import talib as ta
+from firestore_config import *
 
 def shortform(coin: str):
-    count = 0
-    for letter in coin:
-        if letter == "-":
-            break
-        else:
-            count+= 1
-    return coin[0:count]
+    # count = 0
+    # for letter in coin:
+    #     if letter == "-":
+    #         break
+    #     else:
+    #         count+= 1
+    # return coin[0:count]
+
+    return coin.split('-')[0]
+
+
+def price_update(coins, ftx):
+    price_list = []
+    for coin in coins:
+        df = getData(coin, '1h', ftx)
+        last_entry_index = len(df) - 1
+        price = df['close'][last_entry_index]
+        shortened_coin = shortform(coin)
+        price_list.append((shortened_coin, price))
+    print(price_list)
+    return update_prices(price_list)
+
 
 def trading_algo(bot, coin, interval, ftx):
     # trivial check to skip if no users logged in

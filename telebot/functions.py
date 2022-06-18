@@ -84,6 +84,7 @@ def handle_long_trade(job_item, bot, margin):
                 ftx.place_order(market= coin, side= 'buy', price= str(bot.prices[coin]), type= 'limit', size= 0.001)
                 bot.sendText(f"Long trade has been taken\n{coin} at {bot.prices[coin]}", chat_id)
                 # update position here
+
         except:
             bot.sendText( "some other error occured", chat_id)
     else:
@@ -123,13 +124,6 @@ def handle_short_trade(job_item, bot, margin):
     print(job_item.message)
     return 
 
-def handle_no_trade(job_item, bot):
-    bot.sendText(
-        "Trade NOT executed",
-        job_item.chat_id
-    )
-    print(job_item.message)
-    return 
 
 def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
     # print(positions)
@@ -155,5 +149,8 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
                 f"{position['coin']} {position['name']} opened on {position['time']} has been closed", 
                 chat_id
             )
-            pass
+            bot.sendText(
+                f"To open {favoured_trade} position, click on \n/{favoured_trade}_trade_{position['coin']} again",
+                chat_id
+            )
     return 
