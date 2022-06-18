@@ -40,3 +40,9 @@ def delete_position(email, doc_reference):
     doc_ref = reference.document(f"{doc_reference}")
     doc_ref.delete()
     return
+
+def update_prices(price_list):
+    for coin, price in price_list:
+        reference = db.document(u'Prices', f"{coin}")
+        reference.update({'price' : price})
+        print(f"{coin} updated. price: {price}")

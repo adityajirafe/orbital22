@@ -30,13 +30,13 @@ const Position = (props) => {
     useConstructor(() => {
         // console.log('Rendering screen now');
         // Demo Account contains empty trades while email loads
-        const priceRef = collection(fs, 'Prices/');
+        const priceRef = collection(fs, 'Prices');
         getDocs(priceRef).then((doc) => {
             doc.forEach((docu) => {
-                // console.log(docu.data());
+                console.log(docu.data());
                 let priceItem = docu.data();
-                if (priceItem.coin == item.coin) {
-                    setPrice((price) => priceItem.price);
+                if (docu.id == item.coin) {
+                    setPrice(priceItem.price);
                 }
             });
         });
@@ -56,7 +56,9 @@ const Position = (props) => {
                     styles.rowBottom,
                     index % 2 == 0 ? globalStyles.even : globalStyles.odd,
                 ]}>
-                <Text style={styles.text}>${price ? item.qty * price : 0}</Text>
+                <Text style={styles.text}>
+                    ${price ? (item.qty * price).toFixed(2) : 0.0}
+                </Text>
             </View>
         </View>
     );
