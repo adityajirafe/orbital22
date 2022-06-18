@@ -83,13 +83,14 @@ class JobQueue:
                     # users.append([self.waiting[chat_id]['username'], password])
                     email = self.waiting[chat_id]['username']
                     if (login(email, password, self.auth)):
-                        # Mark user as aunthenticated so they can receive trade suggestions
+                        
                         # need to call/create the ftx object here using the email/username/chatid as the key, 
                         # and the ftx info as the value, from firestore
                         FTX_API_KEY = os.getenv('FtxApiKey')
                         FTX_API_SECRET = os.getenv('FtxApiSecret')
                         ftxobj = FtxClient(api_key= FTX_API_KEY, api_secret= FTX_API_SECRET)
                         
+                        # Mark user as aunthenticated so they can receive trade suggestions
                         self.bot.authenticate_user(chat_id, ftxobj)
                         self.bot.store_email(chat_id, email)
                         self.bot.sendText(

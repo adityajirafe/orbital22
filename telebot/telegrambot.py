@@ -68,7 +68,7 @@ class TelegramBot:
         
     def update_coin_prices(self, coin, price):
         self.prices[coin] = price
-        print(self.prices)
+        print(f"THE STORED PRICES ARE {self.prices}")
 
     # def initialise_bot(self):
     #     self.initalised = True
