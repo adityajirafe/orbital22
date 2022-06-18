@@ -59,6 +59,7 @@ const Position = (props) => {
                 <Text style={styles.text}>
                     ${price ? (item.qty * price).toFixed(2) : 0.0}
                 </Text>
+                <Text style={styles.text}>{item.name.toUpperCase()}</Text>
             </View>
         </View>
     );

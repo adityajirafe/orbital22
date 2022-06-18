@@ -21,10 +21,21 @@ const TradeItem = (props) => {
                     styles.rowBottom,
                     index % 2 == 0 ? globalStyles.even : globalStyles.odd,
                 ]}>
-                <Text style={styles.text}>Units: {'\n' + item.units}</Text>
-                <Text style={styles.text}>Price: {'\n' + item.price}</Text>
+                <Text style={styles.text}>
+                    Units: {'\n' + item.units.toFixed(3)}
+                </Text>
+                <Text style={styles.text}>
+                    Price: {'\n' + item.price.toFixed(3)}
+                </Text>
                 <Text style={[styles.value, styles.green]}>
-                    Value: {'\n' + item.value}
+                    Value: {'\n' + item.value.toFixed(3)}
+                </Text>
+                <Text
+                    style={[
+                        styles.text,
+                        item.action == 'CLOSED' ? styles.red : styles.blue,
+                    ]}>
+                    {item.action}
                 </Text>
             </View>
         </View>
@@ -66,17 +77,23 @@ const styles = StyleSheet.create({
     },
     text: {
         fontFamily: 'roboto',
-        fontSize: 15,
+        fontSize: 14,
         flex: 1,
         justifyContent: 'space-evenly',
     },
     value: {
         fontFamily: 'roboto-bold',
-        fontSize: 15,
+        fontSize: 14,
         flex: 1,
         justifyContent: 'space-evenly',
     },
     green: {
         color: COLOURS.green,
+    },
+    blue: {
+        color: COLOURS.blue,
+    },
+    red: {
+        color: COLOURS.red,
     },
 });

@@ -84,22 +84,22 @@ def main():
         
             """Executes the trading algorithm to get trade suggestions every time interval
             predifined by TRADE_SUGGESTION_FREQ"""
-            # if (current_time > (time + timedelta(minutes= TRADE_SUGGESTION_FREQ)) or coin_count != 0):
-            #     coin = coins[coin_count]
+            if (current_time > (time + timedelta(minutes= TRADE_SUGGESTION_FREQ)) or coin_count != 0):
+                coin = coins[coin_count]
                 
-            #     if coin_count >= (num_coins - 1):
-            #         coin_count = 0
-            #     else:
-            #         coin_count+= 1
+                if coin_count >= (num_coins - 1):
+                    coin_count = 0
+                else:
+                    coin_count+= 1
 
-            #     time = current_time
-            #     trading_algo(bot, coin, interval, ftx)
+                time = current_time
+                trading_algo(bot, coin, interval, ftx)
 
             """Updates the coin prices in the database every time interval 
             predefined by COIN_PRICE_UPDATE_FREQUENCY"""
             if (current_time > (time + timedelta(minutes= COIN_PRICE_UPDATE_FREQ))):
                 print('Running Coin Price Update')
-                price_update(coins, ftx)
+                price_update(bot, coins, ftx)
                 
         except:
             print("ERROR in Main Loop")
@@ -109,7 +109,7 @@ def main():
 
 
 if __name__ == '__main__':
-    coins = ['RUNE-PERP', 'BTC-PERP', 'ETH-PERP', 'SOL-PERP']
+    coins = ['RUNE-PERP']#, 'BTC-PERP', 'ETH-PERP', 'SOL-PERP']
     interval = '1h'
 
     site = f'https://api.telegram.org/bot{TOKEN}/getUpdates'
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     job_queue = JobQueue(bot, user_db, user_auth)
 
     """Trade suggestion frequency (in minutes)"""
-    TRADE_SUGGESTION_FREQ = 0.2
+    TRADE_SUGGESTION_FREQ = 1
 
     main()
 

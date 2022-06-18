@@ -4,19 +4,12 @@ from FTXAPI import FtxClient
 import talib as ta
 from firestore_config import *
 
+"""Changes coin naming convention"""
 def shortform(coin: str):
-    # count = 0
-    # for letter in coin:
-    #     if letter == "-":
-    #         break
-    #     else:
-    #         count+= 1
-    # return coin[0:count]
-
     return coin.split('-')[0]
 
-
-def price_update(coins, ftx):
+"""Pulls data from FTX api on coin prices"""
+def price_update(bot, coins, ftx):
     price_list = []
     for coin in coins:
         df = getData(coin, '1h', ftx)
@@ -24,9 +17,22 @@ def price_update(coins, ftx):
         price = df['close'][last_entry_index]
         shortened_coin = shortform(coin)
         price_list.append((shortened_coin, price))
+        # store coin price
+        bot.update_coin_prices(shortened_coin, price)
+
     print(price_list)
     return update_prices(price_list)
 
+"""Pulls data from FTX api on particular coin price"""
+def price_update_single(bot, coin, ftx):
+    price_list = []
+    df = getData(f"{coin}-PERP", '1h', ftx)
+    last_entry_index = len(df) - 1
+    price = df['close'][last_entry_index]
+    price_list.append((coin, price))
+    # store coin price
+    bot.update_coin_prices(coin, price)
+    return update_prices(price_list)
 
 def trading_algo(bot, coin, interval, ftx):
     # trivial check to skip if no users logged in
@@ -47,11 +53,11 @@ def trading_algo(bot, coin, interval, ftx):
     if active_users == []:
         return
     
-    suggested_trade = detect_trade(bot, coin, interval, ftx)
+    suggested_trade = detect_trade(coin, interval, ftx)
     price = suggested_trade['price']
     
     # store the coin and its price in the dictionary to be accessed later on
-    bot.update_coin_prices(coin, price)
+    bot.update_coin_prices(shortened_coin, price)
     
     for chat_id in active_users:
         bot.sendImage(f"{coin}.png", chat_id)
@@ -110,7 +116,7 @@ def getData(coin: str, time: str, ftx: FtxClient):
 
 
 """To detect potential trades"""
-def detect_trade(bot, coin, interval, ftx) -> dict:
+def detect_trade(coin, interval, ftx) -> dict:
     print(f'Detecting trades for {coin}')
 
     # try:
