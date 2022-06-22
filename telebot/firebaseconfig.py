@@ -1,9 +1,11 @@
+import os
 import pyrebase
 from dotenv import load_dotenv
-import os
+
 
 load_dotenv()
 
+"""Retrieve details from env"""
 APIKEY = os.getenv('apiKey')
 AUTH_DOMAIN = os.getenv('authDomain')
 PROJECT_ID = os.getenv('projectId')
@@ -13,6 +15,8 @@ APP_ID = os.getenv('appId')
 MEASUREMENT_ID = os.getenv('measurementId')
 DATABASE_URL = os.getenv('databaseURL')
 
+
+"""Initialise firebase config"""
 firebaseConfig = {
     "apiKey" : APIKEY,
     "authDomain" : AUTH_DOMAIN,
@@ -26,24 +30,10 @@ firebaseConfig = {
 
 firebase = pyrebase.initialize_app(firebaseConfig)
 
-db = firebase.database()
-
-# data = {'name': 'john'}
-
-# db.push(data)
-
-# data = {"Adi": 378, "CY": 331}
-# db.child("Users").set(data)
-
 auth = firebase.auth()
 
-# def signup():
-#     email = input("Enter your email: ")
-#     password = input("Enter your password: ")
-    
-#     user = auth.create_user_with_email_and_password(email, password)
-#     print('success')
 
+"""Authenticate users"""
 def login(email, password, authen):
     try: 
       print(f"Logging in {email}")
@@ -52,10 +42,3 @@ def login(email, password, authen):
     except:
       print(f"User {email} not found")
       return False
-
-# signup()
-
-# db.child("Users").child("Adi").update({'Age': 22})
-
-# result = db.order_by_key().limit_to_last(3).get()
-# print(result.val())
