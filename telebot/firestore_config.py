@@ -1,21 +1,12 @@
 import firebase_admin
-
 from firebase_admin import credentials, firestore
 
+"""Initialise Firebase credentials"""
 cred = credentials.Certificate('telebot/ServiceAccountKey.json')
 default_app = firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
-# def get_trial():
-#     museums = db.collection_group(u'landmarks')\
-#         .where(u'type', u'==', u'museum')
-#     docs = museums.stream()
-#     lst = []
-#     for doc in docs:
-#         lst.append(doc.to_dict())
-
-#     print(lst)
 
 """Used to get list of positions held by user for a specific coin"""
 def get_positions(email, coin): 

@@ -1,20 +1,26 @@
 import pandas as pd
-from firestore_config import *
 from datetime import datetime
+from firestore_config import *
 
 from trading_functions import *
 
+
+"""Gets current time"""
 def get_time():
     time = datetime.now()
     format_data = "%Y-%m-%d, %H:%M:%S"
     return time.strftime(format_data)
 
+
+"""Handles /start input"""
 def handle_start(job_item, bot):
     bot.sendText(
         "Welcome to CoinValet (by Aditya and Cheng Yang)\n\nPlease input your email address",
         job_item.chat_id)
     return 
 
+
+"""Handles users inputting their email address"""
 def handle_username(job_item, bot):
     bot.sendText(
         "Please input your password",
@@ -22,6 +28,8 @@ def handle_username(job_item, bot):
     )
     return job_item.message
 
+
+"""Handles users inputting their password"""
 def handle_password(job_item, bot):
     bot.sendText(
         "Thank you",
@@ -29,6 +37,8 @@ def handle_password(job_item, bot):
     )
     return job_item.message
 
+
+"""Handles users logging out"""
 def handle_logout(job_item, bot):
     chat_id = job_item.chat_id
     del bot.auth_users[chat_id]
@@ -42,6 +52,8 @@ def handle_logout(job_item, bot):
     )
     return
 
+
+"""Handles users silencing trade suggestions"""
 def handle_sleep(job_item, bot):
     chat_id = job_item.chat_id
     bot.sleep.append(chat_id)
@@ -51,6 +63,8 @@ def handle_sleep(job_item, bot):
     )
     return
 
+
+"""Handles users un-silencing trade suggestions"""
 def handle_listen(job_item, bot):
     chat_id = job_item.chat_id
     bot.sleep.remove(chat_id)
@@ -59,7 +73,8 @@ def handle_listen(job_item, bot):
         chat_id
     )
 
-# checks if there is enough money in the account given the amount required to make a trade
+
+"""checks for enough money in account given the amount required to trade"""
 def checkTrade(margin: float, ftx) -> bool:
     s = ftx.get_balances()
     if (s == []):
@@ -71,6 +86,8 @@ def checkTrade(margin: float, ftx) -> bool:
         return balances.free[index] > margin
     return False
 
+
+"""Handles users executing a long trade"""
 def handle_long_trade(job_item, bot, margin):
     chat_id = job_item.chat_id
     # retrieves the correct ftx object from the dictionary corresponding to the chat id
@@ -80,30 +97,32 @@ def handle_long_trade(job_item, bot, margin):
 
     email = bot.chatids[chat_id]
     positions = get_positions(email, coin)
-    # print(f"positions are {positions}")
-    
-    # handle_close_trade(positions, 'long', email, bot, chat_id, SIZE) # use for debugging since checkTrade always returns false
 
     SIZE = 0.001
-    # update_position(email, coin, SIZE, 'short', get_time()) # use for debugging since checkTrade always returns false
 
     # if (checkTrade(margin, ftx)): # use for debugging since checkTrade always returns false
     if True:
         try:
+            """Retrieves coin price"""
             if (coin not in bot.prices):
                 price_update_single(bot, coin, ftx)
             price = bot.prices[coin]
 
+            """Checks current positions and closes unfavourable trades"""
             if len(positions) != 0:
                 if handle_close_trade(positions, 'long', email, bot, chat_id, SIZE, price):
                     return    
             # ftx.place_order(market= coin, side= 'buy', price= str(bot.prices[coin]), type= 'limit', size= SIZE)
-            bot.sendText(f"Long trade has been taken\n{coin} at ${price}", chat_id)
-            # update position here
+            bot.sendText(
+                f"Long trade has been taken\n{coin} at ${price}", 
+                chat_id
+            )
             time = get_time()
+
+            """Updates position on firebase"""
             update_position(email, coin, SIZE, 'long', time)
             
-            #update transaction history
+            """Updates transaction history on firebase"""
             update_trades(
                 email, 
                 coin, 
@@ -116,46 +135,54 @@ def handle_long_trade(job_item, bot, margin):
             )
 
         except:
-            bot.sendText( "some other error occured", chat_id)
+            bot.sendText(
+                "some other error occured", 
+                chat_id
+            )
     else:
-        bot.sendText("not enough money to make the trade", chat_id)
-    print(job_item.message)
+        bot.sendText(
+            "not enough money to make the trade", 
+            chat_id
+        )
+    print(job_item.message) #Debugging statement
     return 
 
+
+"""Handles users executing short trades"""
 def handle_short_trade(job_item, bot, margin):
     chat_id = job_item.chat_id
-    # retrieves the correct ftx object from the dictionary corresponding to the chat id
     ftx = bot.auth_users[chat_id]
-    # stored the specific coin in the job item
     coin = job_item.coin
     
     email = bot.chatids[chat_id]
     positions = get_positions(email, coin)
-    # print(f"positions are {positions}")
-    
-    # handle_close_trade(positions, 'short', email, bot, chat_id, SIZE) # use for debugging since checkTrade always returns false
     
     SIZE = 0.001
-    # update_position(email, coin, SIZE, 'short', get_time()) # use for debugging since checkTrade always returns false
 
     # if (checkTrade(margin, ftx)): # use for debugging since checkTrade always returns false
     if True:
         try:
+            """Retrieves coin price"""
             if (coin not in bot.prices):
                 price_update_single(bot, coin, ftx)
             price = bot.prices[coin]
 
+            """Checks current positions and closes unfavourable trades"""            
             if len(positions) != 0:
                 if handle_close_trade(positions, 'short', email, bot, chat_id, SIZE, price): 
                     return
 
             # ftx.place_order(market= coin, side= 'sell', price= str(bot.prices[coin]), type= 'limit', size= SIZE)
-            bot.sendText(f"Short trade has been taken\n{coin} at ${bot.prices[coin]}", chat_id)
-            # update position here
+            bot.sendText(
+                f"Short trade has been taken\n{coin} at ${bot.prices[coin]}", 
+                chat_id
+            )
             time = get_time()
+            
+            """Update position on firebase"""
             update_position(email, coin, SIZE, 'short', time)
 
-            #update transaction history
+            """Update transaction history on firebase"""
             update_trades(
                 email, 
                 coin, 
@@ -168,19 +195,21 @@ def handle_short_trade(job_item, bot, margin):
             )
                 
         except:
-            bot.sendText( "some other error occured", chat_id)
+            bot.sendText(
+                "some other error occured", 
+                chat_id
+            )
     else:
-        bot.sendText(f"not enough money to make the trade for {coin}", chat_id)
-        print("no money")
-
-    # ftx.place_order(market= coin, side= 'sell', price= str(bot.prices[coin]), type= 'limit', size= 0.001)
-    # bot.sendText(f"Short trade has been taken\n{coin} at {bot.prices[coin]}", chat_id)
-    print(job_item.message)
+        bot.sendText(
+            f"not enough money to make the trade for {coin}", 
+            chat_id
+        )
+    print(job_item.message) #Debugging Statement
     return 
 
 
+"""Handles users closing trade positions"""
 def handle_close_trade(positions, favoured_trade, email, bot, chat_id, units, price):
-    # print(positions)
     num_trades_closed = 0
     for doc_id, position in positions:
         # eg of position: {'name': 'long', 'units': '0.0083', 'price': '$41,803.43', 'coin': 'BTC', 'value': '$346.97', 'time': '2022-03-01, 16:52:45'}
@@ -194,12 +223,12 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id, units, pr
             BTC short closed
             BTC short closed"""
 
-            # close trade on ftx
+            # close trade on ftx (to implement)
 
-            # remove position from firestore
+            """Removes position on firebase"""
             delete_position(email, doc_id) # COMMENT OUT FOR DEBUGGING -> prevent unnecessary deletion of firebase data
             
-            # update transaction history
+            """Updates user trade history on firebase"""
             update_trades(
                 email, 
                 position['coin'], 
@@ -210,14 +239,13 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id, units, pr
                 price * units, 
                 "CLOSED"
             )
-
-            # the send message code below to be moved to the close_trade function after successfully closing trade on ftx
             bot.sendText(
                 f"{position['coin']} {position['name']} opened on {position['time']} has been closed", 
                 chat_id
             )
             num_trades_closed += 1
     
+    """Prompt users to re-input prompt after closing unfavourable trades"""
     if num_trades_closed > 0:
         bot.sendText(
                 f"To open {favoured_trade} position, click on \n/{favoured_trade}_trade_{position['coin']} again",

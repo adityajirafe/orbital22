@@ -1,15 +1,21 @@
 import requests
 from datetime import timedelta, datetime
 
+
 class TelegramBot:
     def __init__(self, botToken: str):
+        """Store Telegram Bot Token Key"""
         self.botToken = botToken
-        # self.initialised = False
+        """Store chat ids and emails as key value pairs"""
         self.chatids = {}
+        """Store authenticated users"""
         self.auth_users = {}
+        """Store latest coin prices for access across code"""
         self.prices = {}
+        """Store users who have silenced trade suggestions"""
         self.sleep = []
 
+    """Polls for user input on Telegram Chat"""
     def TelebotPoll(self, waitTime: int):
 
         site = f'https://api.telegram.org/bot{self.botToken}/getUpdates'
@@ -44,11 +50,12 @@ class TelegramBot:
                 return result        
         return result
         
-
+    """Sends users messages on Telegram Chat"""
     def sendText(self, message, chat_id):
         URL=f"https://api.telegram.org/bot{self.botToken}/sendMessage?chat_id={chat_id}&text={message}"
         requests.get(URL)
 
+    """Sends users images on Telegram Chat"""
     def sendImage(self, directory, chat_id):
         try:
             imgpath = {'photo': open(directory, 'rb')}
@@ -59,16 +66,16 @@ class TelegramBot:
         except:
             print("Failed to send Image")
 
+    """Adds user to authenticated users"""
     def authenticate_user(self, chat_id, ftxobj):
         self.auth_users[chat_id] = ftxobj
         print(self.auth_users)
 
+    """Adds user emails and chat ids"""
     def store_email(self, chat_id, email):
         self.chatids[chat_id] = email
         
+    """Updates the coin prices stored for use across code"""
     def update_coin_prices(self, coin, price):
         self.prices[coin] = price
         print(f"THE STORED PRICES ARE {self.prices}")
-
-    # def initialise_bot(self):
-    #     self.initalised = True

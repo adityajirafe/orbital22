@@ -23,6 +23,7 @@ def price_update(bot, coins, ftx):
     print(price_list)
     return update_prices(price_list)
 
+
 """Pulls data from FTX api on particular coin price"""
 def price_update_single(bot, coin, ftx):
     price_list = []
@@ -34,6 +35,8 @@ def price_update_single(bot, coin, ftx):
     bot.update_coin_prices(coin, price)
     return update_prices(price_list)
 
+
+"""Detects and suggests trade positions"""
 def trading_algo(bot, coin, interval, ftx):
     # trivial check to skip if no users logged in
     if bot.auth_users == {}:
@@ -75,7 +78,7 @@ def trading_algo(bot, coin, interval, ftx):
             bot.sendText(f"{shortened_coin} price is currently {price} USD\nno trade detected for {shortened_coin}")
 
 
-"""To plot the graph of specified coin and save it"""
+"""Plots the graph of specified coin and saves it"""
 def plot_and_save(coin: str, interval: str, ftx: FtxClient):
     df = getData(coin, interval, ftx)
     df = df.tail(150)
@@ -96,7 +99,7 @@ def plot_and_save(coin: str, interval: str, ftx: FtxClient):
     )
 
 
-"""To pull data of specified coin from FTX API"""
+"""Pulls data of specified coin from FTX API"""
 def getData(coin: str, time: str, ftx: FtxClient):
 
     # Pulling dataframe from FTX API
@@ -115,7 +118,7 @@ def getData(coin: str, time: str, ftx: FtxClient):
     return df
 
 
-"""To detect potential trades"""
+"""Detects potential trades"""
 def detect_trade(coin, interval, ftx) -> dict:
     print(f'Detecting trades for {coin}')
 
@@ -141,23 +144,3 @@ def detect_trade(coin, interval, ftx) -> dict:
     else: 
         print('detected no trade')
         return{'type': "NO_TRADE", 'price': price}
-
-    # if (df['10EMA'][last_entry_index] > df['50EMA'][last_entry_index] and position == 0):
-    #     t.sendText(f"Trading on the {interval} interval chart\nTime to open LONG position\n\n/trade\n\n/no_trade")
-    #     print(f'finish detect trade for {chatid}')
-    #     return {'type': 'OPENLONG', 'price': price}
-    # elif (df['10EMA'][last_entry_index] < df['50EMA'][last_entry_index] and position == 0):
-    #     t.sendText(f"Trading on the {interval} interval chart\nTime to open SHORT position\n\n/trade\n\n/no_trade")            
-    #     print(f'finish detect trade for {chatid}')
-    #     return {'type': 'OPENSHORT', 'price': price}
-    # elif (df['10EMA'][last_entry_index] < df['50EMA'][last_entry_index] and position == 1):
-    #     t.sendText(f"Trading on the {interval} interval chart\nTime to close LONG position\n\n/close\n\n/dont_close")
-    #     print(f'finish detect trade for {chatid}')
-    #     return {'type': 'CLOSELONG', 'price': price}
-    # elif (df['10EMA'][last_entry_index] > df['50EMA'][last_entry_index] and position == 2):
-    #     t.sendText(f"Trading on the {interval} interval chart\nTime to close SHORT position\n\n/close\n\n/dont_close")
-    #     print(f'finish detect trade for {chatid}')
-    #     return {'type': 'CLOSESHORT', 'price': price}
-    # else:
-    #     print(f'finish detect trade for {chatid}')
-    #     return {'type': 'notradedetected', 'price': price}

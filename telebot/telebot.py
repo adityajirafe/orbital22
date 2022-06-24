@@ -1,16 +1,17 @@
+import os
+import firebaseconfig as firebase
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 from FTXAPI import FtxClient
 from time import sleep
-from dotenv import load_dotenv
-import os
 
-from job_queue import JobQueue
 from job import Jobs
 from job_item import Job_Item
+from job_queue import JobQueue
 from telegrambot import TelegramBot
 from trading_functions import *
-import firebaseconfig as firebase
 
+"""Handle API KEYS"""
 load_dotenv()
 
 TOKEN = os.getenv('telegramToken')
@@ -18,12 +19,15 @@ TOKEN = os.getenv('telegramToken')
 FTX_API_KEY = os.getenv('FtxApiKey')
 FTX_API_SECRET = os.getenv('FtxApiSecret')
 
+"""Constants"""
 COIN_PRICE_UPDATE_FREQ = 30
 
 
+"""Initialise Telegram Bot with Token"""
 def initialisation():
     return TelegramBot(TOKEN)
-    
+
+
 def main():
     time = datetime.now()
     coin_count = 0
@@ -74,12 +78,16 @@ def main():
                         chat_id
                     )
                     continue
-
+                
+                """Adds valid pending jobs to the job queue"""
                 if pending_job:
                     job_queue.push_job(pending_job)
                     pending_job = None
 
+            """Executes all pending jobs in job queue"""
             job_queue.execute()
+
+
             current_time = datetime.now()
         
             """Executes the trading algorithm to get trade suggestions every time interval
@@ -109,7 +117,7 @@ def main():
 
 
 if __name__ == '__main__':
-    coins = ['RUNE-PERP']#, 'BTC-PERP', 'ETH-PERP', 'SOL-PERP']
+    coins = ['RUNE-PERP', 'BTC-PERP', 'ETH-PERP', 'SOL-PERP']
     interval = '1h'
 
     site = f'https://api.telegram.org/bot{TOKEN}/getUpdates'
@@ -120,8 +128,7 @@ if __name__ == '__main__':
     """Initialise connection with FTX"""
     ftx = FtxClient(api_key= FTX_API_KEY, api_secret= FTX_API_SECRET)
 
-    """Initialise Firebase database and authentication"""
-    user_db = firebase.db
+    """Initialise Firebase authentication"""
     user_auth = firebase.auth
 
     """Initialise the Job Queue"""
