@@ -25,9 +25,9 @@ def get_positions(email, coin):
 
 
 """Used to update positions held by user after opening position"""
-def update_position(email, coin, qty, name, time):
+def update_position(email, coin, qty, name, time, price):
     reference = db.collection(u"UserPortfolio", f"{email}", u'positions')
-    reference.add({'coin': coin, 'qty': qty, 'name': name, 'time': time})
+    reference.add({'coin': coin, 'qty': qty, 'name': name, 'time': time, 'price': price})
 
 
 """Used to delete positions held by user after closing position"""

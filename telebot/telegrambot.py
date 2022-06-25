@@ -78,4 +78,4 @@ class TelegramBot:
     """Updates the coin prices stored for use across code"""
     def update_coin_prices(self, coin, price):
         self.prices[coin] = price
-        print(f"THE STORED PRICES ARE {self.prices}")
+        # print(f"THE STORED PRICES ARE {self.prices}")

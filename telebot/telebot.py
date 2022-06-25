@@ -10,6 +10,7 @@ from job_item import Job_Item
 from job_queue import JobQueue
 from telegrambot import TelegramBot
 from trading_functions import *
+from portfolio_metrics import *
 
 """Handle API KEYS"""
 load_dotenv()
@@ -21,6 +22,8 @@ FTX_API_SECRET = os.getenv('FtxApiSecret')
 
 """Constants"""
 COIN_PRICE_UPDATE_FREQ = 30
+PORTFOLIO_METRICS_UPDATE_FREQ = 0.4
+TRADE_SUGGESTION_FREQ = 1
 
 
 """Initialise Telegram Bot with Token"""
@@ -29,7 +32,9 @@ def initialisation():
 
 
 def main():
-    time = datetime.now()
+    trade_freq_time = datetime.now()
+    coin_update_time = datetime.now()
+    metrics_update_time = datetime.now()
     coin_count = 0
     num_coins = len(coins)
     while True:
@@ -86,13 +91,12 @@ def main():
 
             """Executes all pending jobs in job queue"""
             job_queue.execute()
-
-
+    
             current_time = datetime.now()
         
             """Executes the trading algorithm to get trade suggestions every time interval
             predifined by TRADE_SUGGESTION_FREQ"""
-            if (current_time > (time + timedelta(minutes= TRADE_SUGGESTION_FREQ)) or coin_count != 0):
+            if (current_time > (trade_freq_time + timedelta(minutes= TRADE_SUGGESTION_FREQ)) or coin_count != 0):
                 coin = coins[coin_count]
                 
                 if coin_count >= (num_coins - 1):
@@ -100,14 +104,21 @@ def main():
                 else:
                     coin_count+= 1
 
-                time = current_time
+                trade_freq_time = current_time
                 trading_algo(bot, coin, interval, ftx)
-
+        
             """Updates the coin prices in the database every time interval 
             predefined by COIN_PRICE_UPDATE_FREQUENCY"""
-            if (current_time > (time + timedelta(minutes= COIN_PRICE_UPDATE_FREQ))):
+            if (current_time > (coin_update_time + timedelta(minutes= COIN_PRICE_UPDATE_FREQ))):
                 print('Running Coin Price Update')
+                coin_update_time = current_time
                 price_update(bot, coins, ftx)
+        
+            """Updates the portfolio metrics of every user in the database every time interval
+            predefined by PORTFOLIO_METRICS_UPDATE_FREQ"""
+            if (current_time > (metrics_update_time + timedelta(minutes= PORTFOLIO_METRICS_UPDATE_FREQ))):
+                metrics_update_time = current_time
+                update_metrics(bot, coins, ftx, 'adi@gmail.com')
                 
         except:
             print("ERROR in Main Loop")
@@ -132,10 +143,7 @@ if __name__ == '__main__':
     user_auth = firebase.auth
 
     """Initialise the Job Queue"""
-    job_queue = JobQueue(bot, user_db, user_auth)
-
-    """Trade suggestion frequency (in minutes)"""
-    TRADE_SUGGESTION_FREQ = 1
+    job_queue = JobQueue(bot, user_auth)
 
     main()
 

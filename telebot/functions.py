@@ -3,6 +3,7 @@ from datetime import datetime
 from firestore_config import *
 
 from trading_functions import *
+from portfolio_metrics import upload_realised_profit
 
 
 """Gets current time"""
@@ -120,7 +121,7 @@ def handle_long_trade(job_item, bot, margin):
             time = get_time()
 
             """Updates position on firebase"""
-            update_position(email, coin, SIZE, 'long', time)
+            update_position(email, coin, SIZE, 'long', time, price)
             
             """Updates transaction history on firebase"""
             update_trades(
@@ -180,7 +181,7 @@ def handle_short_trade(job_item, bot, margin):
             time = get_time()
             
             """Update position on firebase"""
-            update_position(email, coin, SIZE, 'short', time)
+            update_position(email, coin, SIZE, 'short', time, price)
 
             """Update transaction history on firebase"""
             update_trades(
@@ -224,6 +225,10 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id, units, pr
             BTC short closed"""
 
             # close trade on ftx (to implement)
+
+            """Update portfolio metrics"""
+            sell_value = price * units
+            upload_realised_profit(email, doc_id, sell_value)
 
             """Removes position on firebase"""
             delete_position(email, doc_id) # COMMENT OUT FOR DEBUGGING -> prevent unnecessary deletion of firebase data
