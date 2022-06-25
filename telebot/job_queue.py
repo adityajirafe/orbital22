@@ -28,6 +28,13 @@ class JobQueue:
         self.queue.append(job_item)
 
 
+    """Checks whether the input is email or password"""
+    def is_valid_input(self, chat_id):
+        if chat_id in self.waiting:
+            return True
+        return False
+
+
     """Execute jobs in job queue"""
     def execute(self):
         try:

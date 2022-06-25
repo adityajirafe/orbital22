@@ -8,8 +8,9 @@ from firestore_config import *
 def shortform(coin: str):
     return coin.split('-')[0]
 
+
 """Pulls data from FTX api on coin prices"""
-def price_update(bot, coins, ftx):
+def get_prices(bot, coins, ftx):
     price_list = []
     for coin in coins:
         df = getData(coin, '1h', ftx)
@@ -20,7 +21,12 @@ def price_update(bot, coins, ftx):
         # store coin price
         bot.update_coin_prices(shortened_coin, price)
 
-    print(price_list)
+    return price_list
+
+
+"""Updates the coin prices stored inside the bot"""
+def price_update(bot, coins, ftx):
+    price_list = get_prices(bot, coins, ftx)
     return update_prices(price_list)
 
 

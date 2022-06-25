@@ -13,7 +13,7 @@ import { doc, getDoc, getDocs, onSnapshot, exists } from 'firebase/firestore';
 import { AuthTextInput, AuthPressable, FeatureImage } from '../components';
 import { globalStyles } from '../styles/Styles';
 import { auth, fs } from '../firebase';
-import { createUser, addDummyData } from '../firebase/dbhelper';
+import { createUser } from '../firebase/dbhelper';
 
 const useConstructor = (callBack = () => {}) => {
     const [hasBeenCalled, setHasBeenCalled] = useState(false);
@@ -26,8 +26,6 @@ const SignupScreen = () => {
     const [users, setUsers] = useState([]);
     useConstructor(() => {
         console.log('Rendering screen now');
-
-        // addDummyData('adi@gmail.com');
 
         // Original method to get data using listener
         // const subscriber = onSnapshot(doc(fs, 'Directory/', 'Users'), (doc) => {
