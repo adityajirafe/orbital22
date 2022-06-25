@@ -20,6 +20,7 @@ const PortfolioScreen = (props) => {
     const { email } = props;
     // const [prices, setPrices] = useState([]);
     const [positions, setPositions] = useState([]);
+    const [metrics, setMetrics] = useState([]);
     useConstructor(() => {
         // console.log('Rendering screen now');
         // Demo Account contains empty trades while email loads
@@ -35,9 +36,9 @@ const PortfolioScreen = (props) => {
         // });
         // console.log('prices', prices);
         const reference = email
-            ? `UserPortfolio/${email}/positions`
-            : 'UserPortfolio/adi/positions';
-        const docRef = collection(fs, reference);
+            ? `UserPortfolio/${email}/`
+            : 'UserPortfolio/adi/';
+        const docRef = collection(fs, reference, 'positions');
         getDocs(docRef).then((doc) => {
             doc.forEach((docu) => {
                 // console.log(docu.data());
@@ -48,7 +49,6 @@ const PortfolioScreen = (props) => {
             });
         });
     });
-    // console.log('position', positions);
     return (
         <View style={globalStyles.container}>
             <View style={styles.portfolioContainer}>
@@ -61,7 +61,7 @@ const PortfolioScreen = (props) => {
                 <View style={styles.titleContainer}>
                     <Text style={styles.title}>Performance</Text>
                 </View>
-                <DashBoard />
+                <DashBoard email={email} />
             </View>
             <StatusBar style="auto" />
         </View>

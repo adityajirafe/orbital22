@@ -10,7 +10,6 @@ const getPrice = (coin, prices) => {
     for (let i = 0; i < prices.length; i++) {
         if (prices[i].coin == coin) {
             price = prices[i].price;
-            console.log(price);
             break;
         }
     }
@@ -33,7 +32,6 @@ const Position = (props) => {
         const priceRef = collection(fs, 'Prices');
         getDocs(priceRef).then((doc) => {
             doc.forEach((docu) => {
-                console.log(docu.data());
                 let priceItem = docu.data();
                 if (docu.id == item.coin) {
                     setPrice(priceItem.price);
