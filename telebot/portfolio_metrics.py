@@ -1,16 +1,3 @@
-"""
-24h profit
-Todays Gain
-
-All time PnL
-Platform Gain
-
-Biggest winner
-Biggest Loser
-
-"""
-
-from pydoc import doc
 from firestore_config import db
 from trading_functions import get_prices, shortform
 
@@ -81,26 +68,38 @@ def override_metric(email, docRef, data):
 
 
 """Retrieves best position held by user"""
-def get_best_position(profits):
+def get_best_position(profits, email):
     profits = list(profits.items())
+    positions = consolidate_positions(email)
     best_coin = profits[0]
     for pair in profits:
+        coin = pair[0]
         profit = pair[1]
-        if profit > best_coin[1]:
+        current_returns = (float(profit) / float(positions[coin]['value']) * 100)
+        if current_returns > (best_coin[1] / float(positions[best_coin[0]]['value']) * 100):
             best_coin = pair
 
-    return best_coin
-
+    position = []
+    position.append(best_coin[0])
+    position.append((float(best_coin[1])/ float(positions[best_coin[0]]['value'])) * 100)
+    return position
 
 """Retrieves worst position held by user"""
-def get_worst_position(profits):
+def get_worst_position(profits, email):
     profits = list(profits.items())
+    positions = consolidate_positions(email)
     worst_coin = profits[0]
     for pair in profits:
+        coin = pair[0]
         profit = pair[1]
-        if profit < worst_coin[1]:
+        current_returns = (float(profit) / float(positions[coin]['value']) * 100)
+        if current_returns < (worst_coin[1] / float(positions[worst_coin[0]]['value']) * 100):
             worst_coin = pair
-    return worst_coin
+
+    position = []
+    position.append(worst_coin[0])
+    position.append((float(worst_coin[1])/ float(positions[worst_coin[0]]['value'])) * 100)
+    return position
 
 
 """Handles and uploads realised profits on firestore"""
@@ -140,7 +139,6 @@ def upload_all_time_profits_percentage(email, all_time_profits):
 
 """Calculates 24-h PnL (%) and uploads it"""
 def upload_daily_profits_percentage(email, daily_profits):
-    print(daily_profits)
     positions = consolidate_positions(email)
     total_value = 0
     for coin, values in positions.items():
@@ -214,14 +212,14 @@ def update_metrics(bot, coins, ftx, email):
     profits = get_profits(bot, coins, ftx, email)
     
     """Finds and uploads best position held by user onto firestore"""
-    best_position = get_best_position(profits)
-    best_position_data = {best_position[0]: best_position[1]}
+    best_position = get_best_position(profits, email)
+    best_position_data = {'value': best_position[1], 'coin': best_position[0]}
     override_metric(email, 'best_position', best_position_data)
     print('best position done')
     
     """Finds and uploads worst position held by user onto firestore"""
-    worst_position = get_worst_position(profits)
-    worst_position_data = {worst_position[0]: worst_position[1]}
+    worst_position = get_worst_position(profits, email)
+    worst_position_data = {'value': worst_position[1], 'coin': worst_position[0]}
     override_metric(email, 'worst_position', worst_position_data)
     print('worst position done')
 

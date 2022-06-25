@@ -1,34 +1,46 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { COLOURS } from '../styles/Colours';
+import { StyleSheet, View } from 'react-native';
 
-import { METRICS } from '../data/portfolioMetrics';
 import DashBoardItem from './DashBoardItem';
 
-const DashBoard = () => {
-    const {
-        dailyProfit,
-        ATProfit,
-        todaysGain,
-        totalGain,
-        biggestWinner,
-        biggestLoser,
-    } = METRICS[0];
+const DashBoard = (props) => {
+    const { email } = props;
 
     return (
         <View style={styles.portfolioContainer}>
             <View style={styles.portfolio}>
-                <DashBoardItem heading={'24h Profit'} text={dailyProfit} />
-                <DashBoardItem heading={'All Time P&L'} text={ATProfit} />
                 <DashBoardItem
-                    heading={'Biggest Winner'}
-                    text={biggestWinner}
+                    heading={'Daily PnL'}
+                    fsReference={'daily_PnL'}
+                    email={email}
+                />
+                <DashBoardItem
+                    heading={'All Time PnL'}
+                    fsReference={'all-time_PnL'}
+                    email={email}
+                />
+                <DashBoardItem
+                    heading={'Best Position'}
+                    fsReference={'best_position'}
+                    email={email}
                 />
             </View>
             <View style={styles.portfolio}>
-                <DashBoardItem heading={"Today's Gain"} text={todaysGain} />
-                <DashBoardItem heading={'Platform Gain'} text={totalGain} />
-                <DashBoardItem heading={'Biggest Loser'} text={biggestLoser} />
+                <DashBoardItem
+                    heading={"Today's Gain"}
+                    fsReference={'daily_PnL_percentage'}
+                    email={email}
+                />
+                <DashBoardItem
+                    heading={'Platform Gain'}
+                    fsReference={'all-time_PnL_percentage'}
+                    email={email}
+                />
+                <DashBoardItem
+                    heading={'Worst Position'}
+                    fsReference={'worst_position'}
+                    email={email}
+                />
             </View>
         </View>
     );
