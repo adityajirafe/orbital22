@@ -47,18 +47,41 @@ class JobQueue:
                     handle_start(job_item, self.bot)
                     self.waiting.update({f'{job_item.chat_id}': {'job': Jobs.USERNAME}})
                     self.queue.remove(job_item)
+
                 elif job_item.job is Jobs.LONGTRADE:
                     handle_long_trade(job_item, self.bot, self.margin)
                     self.queue.remove(job_item)
+
                 elif job_item.job is Jobs.SHORTTRADE:
                     handle_short_trade(job_item, self.bot, self.margin)
                     self.queue.remove(job_item)
+
+                elif job_item.job is Jobs.CLOSELONG:
+                    chat_id = job_item.chat_id
+                    email = self.bot.chatids[job_item.chat_id]
+                    coin = job_item.coin
+                    positions = get_positions(email, coin)
+                    handle_close_trade(positions, 'short', email, self.bot, chat_id)
+                    self.queue.remove(job_item)
+                
+                elif job_item.job is Jobs.CLOSESHORT:
+                    chat_id = job_item.chat_id
+                    email = self.bot.chatids[job_item.chat_id]
+                    coin = job_item.coin
+                    positions = get_positions(email, coin)
+                    print('about to handle')
+                    handle_close_trade(positions, 'long', email, self.bot, chat_id)
+                    print('handled')
+                    self.queue.remove(job_item)
+
                 elif job_item.job is Jobs.LOGOUT:
                     handle_logout(job_item, self.bot)
                     self.queue.remove(job_item)
+
                 elif job_item.job is Jobs.SLEEP:
                     handle_sleep(job_item, self.bot)
                     self.queue.remove(job_item)
+
                 elif job_item.job is Jobs.LISTEN:
                     handle_listen(job_item, self.bot)
                     self.queue.remove(job_item)

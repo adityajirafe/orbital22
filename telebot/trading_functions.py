@@ -69,21 +69,32 @@ def trading_algo(bot, coin, interval, ftx):
     bot.update_coin_prices(shortened_coin, price)
     
     for chat_id in active_users:
-        bot.sendImage(f"{coin}.png", chat_id)
-        if (suggested_trade['type'] == 'LONG'):
-            bot.sendText(
-                f"{shortened_coin} price is currently {price} USD\nFavoured trade: {suggested_trade['type']} at {price} USD\n\n/long_trade_{shortened_coin}\n\n/no_trade",
-                chat_id
-            )
-        elif (suggested_trade['type'] == 'SHORT'):
-            bot.sendText(
-                f"{shortened_coin} price is currently {price} USD\nFavoured trade: {suggested_trade['type']} at {price} USD\n\n/short_trade_{shortened_coin}\n\n/no_trade",
-                chat_id
-            )
-        elif (suggested_trade['type'] == 'NO_TRADE'):
-            bot.sendText(f"{shortened_coin} price is currently {price} USD\nno trade detected for {shortened_coin}")
-
-
+        email = bot.chatids[chat_id]
+        positions = get_positions(email, shortened_coin)
+        print(f"positions: {positions}")
+        
+        if len(positions) == 0:
+            bot.sendImage(f"{coin}.png", chat_id)
+            if (suggested_trade['type'] == 'LONG'):
+                bot.sendText(
+                    f"{shortened_coin} price is currently {price} USD\nFavoured trade: {suggested_trade['type']} at {price} USD\n\n/long_trade_{shortened_coin}\n\n/no_trade",
+                    chat_id
+                )
+            elif (suggested_trade['type'] == 'SHORT'):
+                bot.sendText(
+                    f"{shortened_coin} price is currently {price} USD\nFavoured trade: {suggested_trade['type']} at {price} USD\n\n/short_trade_{shortened_coin}\n\n/no_trade",
+                    chat_id
+                )
+            elif (suggested_trade['type'] == 'NO_TRADE'):
+                bot.sendText(f"{shortened_coin} price is currently {price} USD\nno trade detected for {shortened_coin}")
+        else:
+            for trade in positions:
+                if trade[1]['coin'] == shortened_coin:
+                    if suggested_trade['type'] != trade[1]['name'].upper():
+                        bot.sendText(
+                            f"{shortened_coin} price is currently {price} USD\nClose {trade[1]['name'].upper()} trade at {price} USD\n\n/close_{trade[1]['name']}_{shortened_coin}\n\n/no_trade",
+                            chat_id
+                        )
 """Plots the graph of specified coin and saves it"""
 def plot_and_save(coin: str, interval: str, ftx: FtxClient):
     df = getData(coin, interval, ftx)

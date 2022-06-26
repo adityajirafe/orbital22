@@ -9,3 +9,5 @@ class Jobs(Enum):
     LOGOUT = 6
     SLEEP = 7
     LISTEN = 8
+    CLOSELONG = 9
+    CLOSESHORT = 10

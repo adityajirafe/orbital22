@@ -63,7 +63,14 @@ def main():
                 elif (message.startswith('/short_trade') and chat_id in bot.auth_users):
                     current_coin = message.split('_')[2]
                     pending_job = Job_Item(chat_id, message, Jobs.SHORTTRADE, current_coin)
-                    print("short trade job item created")
+
+                elif (message.startswith('/close_long') and chat_id in bot.auth_users):
+                    current_coin = message.split('_')[2]
+                    pending_job = Job_Item(chat_id, message, Jobs.CLOSELONG, current_coin)
+                    
+                elif (message.startswith('/close_short') and chat_id in bot.auth_users):
+                    current_coin = message.split('_')[2]
+                    pending_job = Job_Item(chat_id, message, Jobs.CLOSESHORT, current_coin)
 
                 elif (message == '/sleep' and chat_id in bot.auth_users):
                     pending_job = Job_Item(chat_id, message, Jobs.SLEEP)
