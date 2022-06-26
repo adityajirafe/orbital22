@@ -3,9 +3,13 @@ from datetime import timedelta, datetime
 
 
 class TelegramBot:
-    def __init__(self, botToken: str):
+    def __init__(self, botToken: str, coins_and_qty, coins):
         """Store Telegram Bot Token Key"""
         self.botToken = botToken
+        """Store coins traded and their respective quantity as a dictionary"""
+        self.coins_and_qty = coins_and_qty
+        """Store coins traded as a list"""
+        self.coins = coins
         """Store chat ids and emails as key value pairs"""
         self.chatids = {}
         """Store authenticated users"""
