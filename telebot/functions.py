@@ -98,6 +98,7 @@ def handle_long_trade(job_item, bot, margin):
 
     email = bot.chatids[chat_id]
     positions = get_positions(email, coin)
+    print(f"positions: {positions}")
 
     SIZE = 0.001
 
@@ -111,9 +112,9 @@ def handle_long_trade(job_item, bot, margin):
 
             """Checks current positions and closes unfavourable trades"""
             if len(positions) != 0:
-                if handle_close_trade(positions, 'long', email, bot, chat_id, SIZE, price):
+                if handle_close_trade(positions, 'long', email, bot, chat_id):
                     return    
-            # ftx.place_order(market= coin, side= 'buy', price= str(bot.prices[coin]), type= 'limit', size= SIZE)
+            # ftx.place_order(market= coin, side= 'buy', price= str(price), type= 'limit', size= SIZE)
             bot.sendText(
                 f"Long trade has been taken\n{coin} at ${price}", 
                 chat_id
@@ -170,12 +171,12 @@ def handle_short_trade(job_item, bot, margin):
 
             """Checks current positions and closes unfavourable trades"""            
             if len(positions) != 0:
-                if handle_close_trade(positions, 'short', email, bot, chat_id, SIZE, price): 
+                if handle_close_trade(positions, 'short', email, bot, chat_id): 
                     return
 
-            # ftx.place_order(market= coin, side= 'sell', price= str(bot.prices[coin]), type= 'limit', size= SIZE)
+            # ftx.place_order(market= coin, side= 'sell', price= str(price), type= 'limit', size= SIZE)
             bot.sendText(
-                f"Short trade has been taken\n{coin} at ${bot.prices[coin]}", 
+                f"Short trade has been taken\n{coin} at ${price}", 
                 chat_id
             )
             time = get_time()
@@ -210,24 +211,33 @@ def handle_short_trade(job_item, bot, margin):
 
 
 """Handles users closing trade positions"""
-def handle_close_trade(positions, favoured_trade, email, bot, chat_id, units, price):
+def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
     num_trades_closed = 0
+    order_type = ''
+    if favoured_trade == 'long':
+        order_type = 'buy'
+    elif favoured_trade == 'short':
+        order_type = 'sell'
     for doc_id, position in positions:
-        # eg of position: {'name': 'long', 'units': '0.0083', 'price': '$41,803.43', 'coin': 'BTC', 'value': '$346.97', 'time': '2022-03-01, 16:52:45'}
-
+        # eg of position: {'name': 'long', 'qty': '0.0083', 'price': '$41,803.43', 'coin': 'BTC', 'value': '$346.97', 'time': '2022-03-01, 16:52:45'}
+        qty = position['qty']
+        coin = position['coin']
+        price = bot.prices[coin]
+        
         if (position['name'] == favoured_trade):
             continue
         else:
-            print(f"{position['coin']} {position['name']} opened on {position['time']} has been closed")
+            print(f"{coin} {position['name']} opened on {position['time']} has been closed")
             """Sample Output:
             BTC long closed
             BTC short closed
             BTC short closed"""
 
-            # close trade on ftx (to implement)
+            """close trade on ftx"""
+            # ftx.place_order(market= coin, side= order_type, price= str(price), type= 'limit', size= qty)
 
             """Update portfolio metrics"""
-            sell_value = price * units
+            sell_value = price * qty
             upload_realised_profit(email, doc_id, sell_value)
 
             """Removes position on firebase"""
@@ -236,16 +246,16 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id, units, pr
             """Updates user trade history on firebase"""
             update_trades(
                 email, 
-                position['coin'], 
+                coin, 
                 position['name'], 
                 price, 
                 get_time(), 
-                units, 
-                price * units, 
+                qty, 
+                price * qty, 
                 "CLOSED"
             )
             bot.sendText(
-                f"{position['coin']} {position['name']} opened on {position['time']} has been closed", 
+                f"{coin} {position['name']} opened on {position['time']} has been closed", 
                 chat_id
             )
             num_trades_closed += 1
@@ -253,7 +263,7 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id, units, pr
     """Prompt users to re-input prompt after closing unfavourable trades"""
     if num_trades_closed > 0:
         bot.sendText(
-                f"To open {favoured_trade} position, click on \n/{favoured_trade}_trade_{position['coin']} again",
+                f"To open {favoured_trade} position, click on \n\n/{favoured_trade}_trade_{coin} again",
                 chat_id
             )
         return True
