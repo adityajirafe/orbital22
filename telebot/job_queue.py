@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from job import Jobs
 from functions import *
-
+from portfolio_metrics import *
 
 load_dotenv()
 
@@ -74,6 +74,10 @@ class JobQueue:
                     print('handled')
                     self.queue.remove(job_item)
 
+                elif job_item.job is Jobs.NOTRADE:
+                    handle_no_trade(job_item, self.bot)
+                    self.queue.remove(job_item)
+
                 elif job_item.job is Jobs.LOGOUT:
                     handle_logout(job_item, self.bot)
                     self.queue.remove(job_item)
@@ -135,7 +139,7 @@ class JobQueue:
                             "Log in successful! \nYou will now begin to receive trade suggestions",
                             chat_id
                         )
-
+                        
                     else: 
                         self.bot.sendText(
                             "User not found. Press /start to restart bot\nNew users head to the CoinValet App to sign up!", 
@@ -144,6 +148,10 @@ class JobQueue:
 
                     del self.waiting[chat_id]
                     self.queue.remove(job_item)
+                    email = self.bot.chatids[chat_id]
+                    print(f"coins: {self.bot.coins}")
+                    update_metrics(self.bot, self.bot.coins, ftxobj, email)
+                    print('updated metrics after user authenticated')
                     return
                 else:
                     continue

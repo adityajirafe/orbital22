@@ -74,6 +74,15 @@ def handle_listen(job_item, bot):
         chat_id
     )
 
+"""Handles no trade events"""
+def handle_no_trade(job_item, bot):
+    chat_id = job_item.chat_id
+    coin = job_item.coin
+    bot.sendText(
+        f"{coin} trade NOT taken",
+        chat_id
+    )
+    return
 
 """checks for enough money in account given the amount required to trade"""
 def checkTrade(margin: float, ftx) -> bool:
@@ -100,8 +109,7 @@ def handle_long_trade(job_item, bot, margin):
     positions = get_positions(email, coin)
     print(f"positions: {positions}")
 
-    SIZE = 0.001
-
+    SIZE = bot.coins_and_qty[coin + "-PERP"]
     # if (checkTrade(margin, ftx)): # use for debugging since checkTrade always returns false
     if True:
         try:
@@ -116,7 +124,7 @@ def handle_long_trade(job_item, bot, margin):
                     return    
             # ftx.place_order(market= coin, side= 'buy', price= str(price), type= 'limit', size= SIZE)
             bot.sendText(
-                f"Long trade has been taken\n{coin} at ${price}", 
+                f"Long trade has been taken\n{coin} at ${price} and {SIZE} units", 
                 chat_id
             )
             time = get_time()
@@ -158,8 +166,9 @@ def handle_short_trade(job_item, bot, margin):
     
     email = bot.chatids[chat_id]
     positions = get_positions(email, coin)
-    
-    SIZE = 0.001
+
+    print(bot.coins_and_qty[coin + "-PERP"])
+    SIZE = bot.coins_and_qty[coin + "-PERP"]
 
     # if (checkTrade(margin, ftx)): # use for debugging since checkTrade always returns false
     if True:
@@ -176,7 +185,7 @@ def handle_short_trade(job_item, bot, margin):
 
             # ftx.place_order(market= coin, side= 'sell', price= str(price), type= 'limit', size= SIZE)
             bot.sendText(
-                f"Short trade has been taken\n{coin} at ${price}", 
+                f"Short trade has been taken\n{coin} at ${price} and {SIZE} units", 
                 chat_id
             )
             time = get_time()

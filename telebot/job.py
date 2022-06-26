@@ -11,3 +11,4 @@ class Jobs(Enum):
     LISTEN = 8
     CLOSELONG = 9
     CLOSESHORT = 10
+    NOTRADE = 11

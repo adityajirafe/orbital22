@@ -27,8 +27,8 @@ TRADE_SUGGESTION_FREQ = 1
 
 
 """Initialise Telegram Bot with Token"""
-def initialisation():
-    return TelegramBot(TOKEN)
+def initialisation(coins_and_qty, coins):
+    return TelegramBot(TOKEN, coins_and_qty, coins)
 
 
 def main():
@@ -84,6 +84,8 @@ def main():
                 elif job_queue.is_valid_input(chat_id):
                     pending_job = Job_Item(chat_id, message, Jobs.USERNAME)
                 
+                elif (message.startswith('/no_trade') and chat_id in bot.auth_users):
+                    pending_job = Job_Item(chat_id, message, Jobs.NOTRADE, current_coin)
                 else:
                     bot.sendText(
                         "Invalid input, press /start to use CoinValet or use another valid prompt",
@@ -125,7 +127,8 @@ def main():
             predefined by PORTFOLIO_METRICS_UPDATE_FREQ"""
             if (current_time > (metrics_update_time + timedelta(minutes= PORTFOLIO_METRICS_UPDATE_FREQ))):
                 metrics_update_time = current_time
-                update_metrics(bot, coins, ftx, 'adi@gmail.com')
+                email = bot.chatids[chat_id]
+                update_metrics(bot, coins, ftx, email)
                 
         except:
             print("ERROR in Main Loop")
@@ -135,13 +138,17 @@ def main():
 
 
 if __name__ == '__main__':
-    coins = ['RUNE-PERP', 'BTC-PERP', 'ETH-PERP', 'SOL-PERP']
+    coins = []
+    coins_and_qty = {'RUNE-PERP': 1, 'BTC-PERP': 0.001, 'ETH-PERP': 0.001, 'SOL-PERP': 0.1}
+    for coin in coins_and_qty:
+        coins.append(coin)
+    
     interval = '1h'
 
     site = f'https://api.telegram.org/bot{TOKEN}/getUpdates'
     
     """Initialise the Telegram bot"""
-    bot = initialisation()
+    bot = initialisation(coins_and_qty, coins)
 
     """Initialise connection with FTX"""
     ftx = FtxClient(api_key= FTX_API_KEY, api_secret= FTX_API_SECRET)
