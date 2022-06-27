@@ -77,12 +77,12 @@ def trading_algo(bot, coin, interval, ftx):
             bot.sendImage(f"{coin}.png", chat_id)
             if (suggested_trade['type'] == 'LONG'):
                 bot.sendText(
-                    f"{shortened_coin} price is currently {price} USD\nFavoured trade: {suggested_trade['type']} at {price} USD\n\n/long_trade_{shortened_coin}\n\n/no_trade",
+                    f"{shortened_coin} price is currently {price} USD\nFavoured trade: {suggested_trade['type']} at {price} USD\n\n/long_trade_{shortened_coin}\n\n/no_trade_{shortened_coin}",
                     chat_id
                 )
             elif (suggested_trade['type'] == 'SHORT'):
                 bot.sendText(
-                    f"{shortened_coin} price is currently {price} USD\nFavoured trade: {suggested_trade['type']} at {price} USD\n\n/short_trade_{shortened_coin}\n\n/no_trade",
+                    f"{shortened_coin} price is currently {price} USD\nFavoured trade: {suggested_trade['type']} at {price} USD\n\n/short_trade_{shortened_coin}\n\n/no_trade_{shortened_coin}",
                     chat_id
                 )
             elif (suggested_trade['type'] == 'NO_TRADE'):
@@ -92,7 +92,7 @@ def trading_algo(bot, coin, interval, ftx):
                 if trade[1]['coin'] == shortened_coin:
                     if suggested_trade['type'] != trade[1]['name'].upper():
                         bot.sendText(
-                            f"{shortened_coin} price is currently {price} USD\nClose {trade[1]['name'].upper()} trade at {price} USD\n\n/close_{trade[1]['name']}_{shortened_coin}\n\n/no_trade",
+                            f"{shortened_coin} price is currently {price} USD\nClose {trade[1]['name'].upper()} trade at {price} USD\n\n/close_{trade[1]['name']}_{shortened_coin}\n\n/no_trade_{shortened_coin}",
                             chat_id
                         )
 """Plots the graph of specified coin and saves it"""

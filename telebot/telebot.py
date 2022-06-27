@@ -71,6 +71,10 @@ def main():
                 elif (message.startswith('/close_short') and chat_id in bot.auth_users):
                     current_coin = message.split('_')[2]
                     pending_job = Job_Item(chat_id, message, Jobs.CLOSESHORT, current_coin)
+                
+                elif (message.startswith('/no_trade') and chat_id in bot.auth_users):
+                    current_coin = message.split('_')[2]
+                    pending_job = Job_Item(chat_id, message, Jobs.NOTRADE, current_coin)
 
                 elif (message == '/sleep' and chat_id in bot.auth_users):
                     pending_job = Job_Item(chat_id, message, Jobs.SLEEP)
@@ -84,8 +88,6 @@ def main():
                 elif job_queue.is_valid_input(chat_id):
                     pending_job = Job_Item(chat_id, message, Jobs.USERNAME)
                 
-                elif (message.startswith('/no_trade') and chat_id in bot.auth_users):
-                    pending_job = Job_Item(chat_id, message, Jobs.NOTRADE, current_coin)
                 else:
                     bot.sendText(
                         "Invalid input, press /start to use CoinValet or use another valid prompt",

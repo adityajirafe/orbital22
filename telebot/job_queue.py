@@ -75,6 +75,7 @@ class JobQueue:
                     self.queue.remove(job_item)
 
                 elif job_item.job is Jobs.NOTRADE:
+                    print('about to handle no trade')
                     handle_no_trade(job_item, self.bot)
                     self.queue.remove(job_item)
 

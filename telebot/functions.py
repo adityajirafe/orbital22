@@ -76,8 +76,10 @@ def handle_listen(job_item, bot):
 
 """Handles no trade events"""
 def handle_no_trade(job_item, bot):
+    print('inside handle no trade')
     chat_id = job_item.chat_id
     coin = job_item.coin
+    print('about to send text')
     bot.sendText(
         f"{coin} trade NOT taken",
         chat_id
