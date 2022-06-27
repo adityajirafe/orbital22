@@ -1,7 +1,6 @@
 import mplfinance as fplt
 import pandas as pd
 from FTXAPI import FtxClient
-import talib as ta
 from firestore_config import *
 
 """Changes coin naming convention"""
@@ -100,8 +99,8 @@ def plot_and_save(coin: str, interval: str, ftx: FtxClient):
     df = getData(coin, interval, ftx)
     df = df.tail(150)
     #plotting the graph and saving it
-    ap2 = [fplt.make_addplot(df['50EMA'], color='#180dad', panel= 1), 
-            fplt.make_addplot(df['10EMA'], color='#ffff40', panel= 1),
+    ap2 = [fplt.make_addplot(df['10EMA'], color='#180dad', panel= 1), 
+            fplt.make_addplot(df['25EMA'], color='#FFA500', panel= 1),
             fplt.make_addplot(df['RSI'], color='#6a0dad', panel= 2)]
 
     fplt.plot(
@@ -125,13 +124,19 @@ def getData(coin: str, time: str, ftx: FtxClient):
     df.index = pd.to_datetime(df.index, infer_datetime_format = True)
 
     # Adding the RSI column
-    df['RSI'] = ta.RSI(df['close'], timeperiod = 9)
+    df['close_delta'] = df['close'].diff()
+    df['up'] = df['close_delta'].clip(lower=0)
+    df['down'] = -1 * df['close_delta'].clip(upper=0)
 
-    # Adding the 50 day EMA
-    df['50EMA'] = ta.EMA(df['close'], timeperiod = 50)
+    df['ma_up'] = df['up'].rolling(window = 14).mean()
+    df['ma_down'] = df['down'].rolling(window = 14).mean()
+    df['RSI']= 100 - (100/(1 + df['ma_up']/df['ma_down']))
 
+    # Adding the 25 day EMA
+    df['25EMA'] = df['close'].ewm(span=25, adjust=False).mean()
+    
     # Adding the 10 day EMA
-    df['10EMA'] = ta.EMA(df['close'], timeperiod = 10)
+    df['10EMA'] = df['close'].ewm(span=10, adjust=False).mean()
     return df
 
 
@@ -150,12 +155,12 @@ def detect_trade(coin, interval, ftx) -> dict:
     print(f"Price of {coin} is {price}")
 
     EMA_10 = df['10EMA'][last_entry_index]
-    EMA_50 = df['50EMA'][last_entry_index]
+    EMA_25 = df['25EMA'][last_entry_index]
 
-    if EMA_10 > EMA_50:
+    if EMA_10 > EMA_25:
         print('detected favour long')
         return {'type': "LONG", 'price': price}
-    elif EMA_10 < EMA_50:
+    elif EMA_10 < EMA_25:
         print('detected favour short')
         return {'type': "SHORT", 'price': price}
     else: 
