@@ -151,7 +151,7 @@ class JobQueue:
                     self.queue.remove(job_item)
                     email = self.bot.chatids[chat_id]
                     print(f"coins: {self.bot.coins}")
-                    update_metrics(self.bot, self.bot.coins, ftxobj, email)
+                    update_metrics(self.bot, self.bot.coins, self.bot.master_ftxobj, email)
                     print('updated metrics after user authenticated')
                     return
                 else:

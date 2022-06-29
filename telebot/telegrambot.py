@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 
 
 class TelegramBot:
-    def __init__(self, botToken: str, coins_and_qty, coins):
+    def __init__(self, botToken: str, coins_and_qty, coins, master_ftxobj):
         """Store Telegram Bot Token Key"""
         self.botToken = botToken
         """Store coins traded and their respective quantity as a dictionary"""
@@ -18,6 +18,8 @@ class TelegramBot:
         self.prices = {}
         """Store users who have silenced trade suggestions"""
         self.sleep = []
+        """The master FTX object used only for pulling price data"""
+        self.master_ftxobj = master_ftxobj
 
     """Polls for user input on Telegram Chat"""
     def TelebotPoll(self, waitTime: int):
