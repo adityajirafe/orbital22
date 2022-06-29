@@ -2,6 +2,7 @@ import os
 from firebaseconfig import login
 from FTXAPI import FtxClient
 from dotenv import load_dotenv
+from datetime import timedelta, datetime
 
 from job import Jobs
 from functions import *
@@ -39,7 +40,9 @@ class JobQueue:
     def execute(self):
         try:
             """Handle users who are crrently being served first"""
-            self.check_waiting()
+            time = datetime.now()
+            waitingTime = time + timedelta(seconds=10)
+            self.check_waiting(waitingTime)
 
             while self.queue:
                 job_item = self.queue[0]
@@ -98,9 +101,17 @@ class JobQueue:
             return
 
     """Handles input from users currently being served"""
-    def check_waiting(self):
+    def check_waiting(self, waitingTime):
+        
         if not self.waiting:
             return
+        # if waitingTime < datetime.now():
+        #     self.bot.sendText(
+        #         "Login Timeout. Press /start to restart bot",
+        #         chat_id
+        #     )
+        #     del self.waiting[chat_id]
+        #     return
         for job_item in self.queue:
             chat_id = job_item.chat_id
 

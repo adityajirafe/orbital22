@@ -46,12 +46,13 @@ class TelegramBot:
                     elif new_update_id > old_update_id:
                         chat_id = str(entry['message']['chat']['id'])  # reads chat ID
                         name = str(entry['message']['chat']['first_name'])  # reads username
-    
-                        text = str(entry['message']['text'])  # reads what they have sent
-                        requests.get(f'https://api.telegram.org/bot{self.botToken}/getUpdates?offset=' + str(new_update_id))
-                        result.append({'first_name': name, 'chat_id': chat_id, 'message': text})
-                        print(result)
-                        continue
+
+                        if 'text' in entry['message']:
+                            text = str(entry['message']['text'])  # reads what they have sent
+                            requests.get(f'https://api.telegram.org/bot{self.botToken}/getUpdates?offset=' + str(new_update_id))
+                            result.append({'first_name': name, 'chat_id': chat_id, 'message': text})
+                            print(result)
+                            continue
                 
                 return result        
         return result
