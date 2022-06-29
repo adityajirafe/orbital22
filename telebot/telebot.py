@@ -21,14 +21,14 @@ FTX_API_KEY = os.getenv('FtxApiKey')
 FTX_API_SECRET = os.getenv('FtxApiSecret')
 
 """Constants"""
-COIN_PRICE_UPDATE_FREQ = 30
-PORTFOLIO_METRICS_UPDATE_FREQ = 30
+COIN_PRICE_UPDATE_FREQ = 10
+PORTFOLIO_METRICS_UPDATE_FREQ = 10
 TRADE_SUGGESTION_FREQ = 1
 
 
 """Initialise Telegram Bot with Token"""
-def initialisation(coins_and_qty, coins):
-    return TelegramBot(TOKEN, coins_and_qty, coins)
+def initialisation(coins_and_qty, coins, master_ftxobj):
+    return TelegramBot(TOKEN, coins_and_qty, coins, master_ftxobj)
 
 
 def main():
@@ -149,12 +149,12 @@ if __name__ == '__main__':
 
     site = f'https://api.telegram.org/bot{TOKEN}/getUpdates'
     
-    """Initialise the Telegram bot"""
-    bot = initialisation(coins_and_qty, coins)
-
     """Initialise connection with FTX"""
     ftx = FtxClient(api_key= FTX_API_KEY, api_secret= FTX_API_SECRET)
 
+    """Initialise the Telegram bot"""
+    bot = initialisation(coins_and_qty, coins, ftx)
+    
     """Initialise Firebase authentication"""
     user_auth = firebase.auth
 

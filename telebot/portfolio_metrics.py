@@ -23,8 +23,9 @@ def consolidate_positions(email):
     consolidated_positions = {}
     for position in list_of_positions:
         coin = position['coin']
+        name = position['name']
         if coin not in consolidated_positions:
-            consolidated_positions[coin] = {'qty': 0, 'value': 0}
+            consolidated_positions[coin] = {'qty': 0, 'value': 0, 'name': name}
         consolidated_positions[coin]['qty'] = consolidated_positions[coin]['qty'] + position['qty']
         consolidated_positions[coin]['value'] = consolidated_positions[coin]['value'] + (position['qty'] * position['price'])
 
@@ -49,9 +50,11 @@ def get_profits(bot, coins, ftx, email):
             continue
         value = positions[coin]['value']
         current_value = price_directory[coin] * positions[coin]['qty']
-        profit = current_value - value
+        if positions[coin]['name'] == 'long':
+            profit = current_value - value
+        elif positions[coin]['name'] == 'short':
+            profit = value - current_value 
         profits.update({coin: profit})
-    print(profits)
     return profits 
 
 

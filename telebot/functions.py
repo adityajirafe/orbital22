@@ -3,7 +3,7 @@ from datetime import datetime
 from firestore_config import *
 
 from trading_functions import *
-from portfolio_metrics import upload_realised_profit
+from portfolio_metrics import *
 
 
 """Gets current time"""
@@ -123,12 +123,14 @@ def handle_long_trade(job_item, bot, margin):
             """Checks current positions and closes unfavourable trades"""
             if len(positions) != 0:
                 if handle_close_trade(positions, 'long', email, bot, chat_id):
+                    print("close trade")
                     return    
             # ftx.place_order(market= coin, side= 'buy', price= str(price), type= 'limit', size= SIZE)
             bot.sendText(
                 f"Long trade has been taken\n{coin} at ${price} and {SIZE} units", 
                 chat_id
             )
+            print("after text")
             time = get_time()
 
             """Updates position on firebase"""
@@ -250,7 +252,7 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
             """Update portfolio metrics"""
             sell_value = price * qty
             upload_realised_profit(email, doc_id, sell_value)
-
+            update_metrics(bot, bot.coins, bot.master_ftxobj, email)
             """Removes position on firebase"""
             delete_position(email, doc_id) # COMMENT OUT FOR DEBUGGING -> prevent unnecessary deletion of firebase data
             
@@ -265,6 +267,8 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
                 price * qty, 
                 "CLOSED"
             )
+            
+            print(f"updated metrics after trade closed by {email}")
             bot.sendText(
                 f"{coin} {position['name']} opened on {position['time']} has been closed", 
                 chat_id
