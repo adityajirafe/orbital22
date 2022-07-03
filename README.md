@@ -1,6 +1,19 @@
 # CoinValet
 
 ## How to run application:
+Update:
+
+Step 1) You may download the app on Android by contacting us on Telegram for the apk file @anchengyang or @adigiraffe
+
+Step 2) You will then need to register an account on the app
+
+Step 3) You will be able to login to the account through the Telegram Bot @orbitaltest_bot
+
+Step 4) After logging in, you will be able to take trades that the bot suggests, or you can explore the command menu for other features
+
+Alternatively:
+
+You may run the app on your local machine
 
 Ensure you have `node`, `npm` and `expo-cli` installed
 
@@ -30,6 +43,11 @@ storageBucket=""
 messagingSenderId=""
 appId=""
 measurementId=""
+databaseURL=""
+
+telegramToken=""
+FtxApiKey=""
+FtxApiSecret=""
 ```
 
 ## Unsure how to obtain firebase configuration?
@@ -59,8 +77,10 @@ Copy the values under `const firebaseConfig` into your .env file as stated above
 Disclaimer: Since the bot is in constant development, we will not be hosting the
 bot on any server for visitors to try, as it limits our ability to improve the
 bot.
+Update: The bot is currently live and hosted on PythonAnywhere. However, there may be times
+when the bot is down as we are still working on it.
 
-As such, to those who wish to test the bot, the solution is to clone the
+As such, to those who wish to use our code to test the bot, the solution is to clone the
 repository and create your own bot. A brief description is showed below:
 
 Run `cd orbital22/telebot`
@@ -86,8 +106,8 @@ All dependencies used for the python telegram bot are stored in `requirements.tx
 Run `pip install -r requirements.txt` in the venv in order to download the dependencies into the working environment
 
 Using @BotFather on telegram, create a new bot and receive the bot token. input
-it inside `telebot/main.py`
+it inside the .env file
 
-Input your `FTX api_key` and `api_secret` inside `telebot/main.py`
+Input your `FTX api_key` and `api_secret` inside the .env file
 
-Run `python main.py`
+Run `python telebot.py`
