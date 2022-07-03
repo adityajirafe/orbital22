@@ -128,9 +128,9 @@ def getData(coin: str, time: str, ftx: FtxClient):
     df['up'] = df['close_delta'].clip(lower=0)
     df['down'] = -1 * df['close_delta'].clip(upper=0)
 
-    df['ma_up'] = df['up'].rolling(window = 14).mean()
-    df['ma_down'] = df['down'].rolling(window = 14).mean()
-    df['RSI']= 100 - (100/(1 + df['ma_up']/df['ma_down']))
+    df['ema_up'] = df['up'].ewm(com = 13, adjust = False).mean()
+    df['ema_down'] = df['down'].ewm(com = 13, adjust = False).mean()
+    df['RSI']= 100 - (100/(1 + df['ema_up']/df['ema_down']))
 
     # Adding the 25 day EMA
     df['25EMA'] = df['close'].ewm(span=25, adjust=False).mean()

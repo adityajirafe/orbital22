@@ -1,5 +1,5 @@
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 from firestore_config import *
 
 from trading_functions import *
@@ -8,7 +8,7 @@ from portfolio_metrics import *
 
 """Gets current time"""
 def get_time():
-    time = datetime.now()
+    time = datetime.now() + timedelta(minutes= 480)
     format_data = "%Y-%m-%d, %H:%M:%S"
     return time.strftime(format_data)
 
@@ -16,7 +16,7 @@ def get_time():
 """Handles /start input"""
 def handle_start(job_item, bot):
     bot.sendText(
-        "Welcome to CoinValet (by Aditya and Cheng Yang)\n\nPlease input your email address",
+        "Welcome to CoinValet (by Aditya and Cheng Yang)\n\nPlease input your email address!\nYou have 30 seconds to do so.",
         job_item.chat_id)
     return 
 
@@ -24,10 +24,10 @@ def handle_start(job_item, bot):
 """Handles users inputting their email address"""
 def handle_username(job_item, bot):
     bot.sendText(
-        "Please input your password",
+        "Please input your password!\nYou have 30 seconds to do so.",
         job_item.chat_id
     )
-    return job_item.message
+    return job_item.message.lower()
 
 
 """Handles users inputting their password"""
