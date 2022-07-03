@@ -77,6 +77,7 @@ Copy the values under `const firebaseConfig` into your .env file as stated above
 Disclaimer: Since the bot is in constant development, we will not be hosting the
 bot on any server for visitors to try, as it limits our ability to improve the
 bot.
+
 Update: The bot is currently live and hosted on PythonAnywhere. However, there may be times
 when the bot is down as we are still working on it.
 
