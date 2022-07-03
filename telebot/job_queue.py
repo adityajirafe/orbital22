@@ -22,6 +22,8 @@ class JobQueue:
         self.waiting = {}
         """Set the default margin used to execute trades"""
         self.margin = 1
+        """Set the default login waiting time to be 30seconds"""
+        self.waiting_time = 30
 
 
     """Push jobs into job queue"""
@@ -40,15 +42,15 @@ class JobQueue:
     def execute(self):
         try:
             """Handle users who are crrently being served first"""
-            time = datetime.now()
-            waitingTime = time + timedelta(seconds=10)
-            self.check_waiting(waitingTime)
+            self.check_waiting()
 
             while self.queue:
                 job_item = self.queue[0]
                 if job_item.job is Jobs.START:
                     handle_start(job_item, self.bot)
-                    self.waiting.update({f'{job_item.chat_id}': {'job': Jobs.USERNAME}})
+                    time = datetime.now() + timedelta(minutes= 480)
+                    waiting_time = time + timedelta(seconds=self.waiting_time)
+                    self.waiting.update({f'{job_item.chat_id}': {'waiting_time': waiting_time, 'job': Jobs.USERNAME}})
                     self.queue.remove(job_item)
 
                 elif job_item.job is Jobs.LONGTRADE:
@@ -72,13 +74,10 @@ class JobQueue:
                     email = self.bot.chatids[job_item.chat_id]
                     coin = job_item.coin
                     positions = get_positions(email, coin)
-                    print('about to handle')
                     handle_close_trade(positions, 'long', email, self.bot, chat_id)
-                    print('handled')
                     self.queue.remove(job_item)
 
                 elif job_item.job is Jobs.NOTRADE:
-                    print('about to handle no trade')
                     handle_no_trade(job_item, self.bot)
                     self.queue.remove(job_item)
 
@@ -101,21 +100,25 @@ class JobQueue:
             return
 
     """Handles input from users currently being served"""
-    def check_waiting(self, waitingTime):
+    def check_waiting(self):
         
         if not self.waiting:
             return
-        # if waitingTime < datetime.now():
-        #     self.bot.sendText(
-        #         "Login Timeout. Press /start to restart bot",
-        #         chat_id
-        #     )
-        #     del self.waiting[chat_id]
-        #     return
+        for chat_id in self.waiting:
+            if self.waiting[chat_id]['waiting_time'] < datetime.now() + timedelta(minutes= 480):
+                    print('timeout')
+                    self.bot.sendText(
+                        "Login Timeout. Press /start to restart bot",
+                        chat_id
+                    )
+                    del self.waiting[chat_id]
+                    return
+                    
         for job_item in self.queue:
             chat_id = job_item.chat_id
 
             if chat_id in self.waiting:
+                
                 job = self.waiting[chat_id]['job']
 
                 if job_item.message == '/start':
@@ -128,9 +131,11 @@ class JobQueue:
                     return
                 
                 if job is Jobs.USERNAME:
+                    time = datetime.now() + timedelta(minutes= 480)
+                    waiting_time = time + timedelta(seconds=self.waiting_time)
                     username = handle_username(job_item, self.bot)
                     self.waiting.update(
-                        {chat_id: {'job': Jobs.PASSWORD, 'username': username}}
+                        {chat_id: {'waiting_time': waiting_time, 'job': Jobs.PASSWORD, 'username': username}}
                     )
                     self.queue.remove(job_item)
                     return

@@ -32,14 +32,16 @@ def initialisation(coins_and_qty, coins, master_ftxobj):
 
 
 def main():
-    trade_freq_time = datetime.now()
-    coin_update_time = datetime.now()
-    metrics_update_time = datetime.now()
+    trade_freq_time = datetime.now() + timedelta(minutes= 480)
+    coin_update_time = datetime.now() + timedelta(minutes= 480)
+    metrics_update_time = datetime.now() + timedelta(minutes= 480)
     coin_count = 0
     num_coins = len(coins)
     while True:
         try:
+            print("polling")
             result = bot.TelebotPoll(10)
+            
             for input in result:
                 message = input['message']
                 chat_id = input['chat_id']
@@ -103,7 +105,7 @@ def main():
             """Executes all pending jobs in job queue"""
             job_queue.execute()
     
-            current_time = datetime.now()
+            current_time = datetime.now() + timedelta(minutes= 480)
         
             """Executes the trading algorithm to get trade suggestions every time interval
             predifined by TRADE_SUGGESTION_FREQ"""
@@ -134,6 +136,7 @@ def main():
                 
         except:
             print("ERROR in Main Loop")
+            print(job_queue.queue)
             sleep(10)
             pass
 
