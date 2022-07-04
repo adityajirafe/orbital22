@@ -106,16 +106,21 @@ def get_worst_position(profits, email):
 
 
 """Handles and uploads realised profits on firestore"""
-def upload_realised_profit(email, doc_reference, sell_value):
+def upload_realised_profit(email, doc_reference, sell_value, opened_trade):
     reference = db.collection(u'UserPortfolio', f"{email}", u'positions')
     doc_ref = reference.document(f"{doc_reference}").get()
     doc_data = doc_ref.to_dict()
     initial_value = doc_data['price'] * doc_data['qty']
-    realised_profit = sell_value - initial_value
+    
+    if (opened_trade == 'long'):
+        realised_profit = sell_value - initial_value
+    else:
+        realised_profit =  initial_value - sell_value
     time = doc_data['time']
     data = {time: realised_profit}
     upload_metric(email, 'realised_transactions', data)
     set_realised_profits(email)
+    return realised_profit
 
 
 """Calculates realised profits and uploads tabulated amount"""

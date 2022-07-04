@@ -86,7 +86,7 @@ def handle_balance(job_item, bot):
         total = coin['total']
         value = coin['usdValue']
         if total != 0:
-            sentence = f'{c}\namount: {total}\nvalue: {value} USD\n\n'
+            sentence = f'{c}\nAmount: {total}\nValue: {value} USD\n\n'
             mybalance = mybalance + sentence
     
     print(mybalance)
@@ -270,7 +270,7 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
 
             """Update portfolio metrics"""
             sell_value = price * qty
-            upload_realised_profit(email, doc_id, sell_value)
+            profit = upload_realised_profit(email, doc_id, sell_value, position['name'])
             update_metrics(bot, bot.coins, bot.master_ftxobj, email)
             """Removes position on firebase"""
             delete_position(email, doc_id) # COMMENT OUT FOR DEBUGGING -> prevent unnecessary deletion of firebase data
@@ -289,7 +289,7 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
             
             print(f"updated metrics after trade closed by {email}")
             bot.sendText(
-                f"{coin} {position['name']} opened on {position['time']} has been closed", 
+                f"{coin} {position['name']} opened on {position['time']} has been closed\nProfit: {profit}", 
                 chat_id
             )
             num_trades_closed += 1
