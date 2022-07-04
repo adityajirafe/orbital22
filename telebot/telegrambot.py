@@ -26,35 +26,36 @@ class TelegramBot:
 
         site = f'https://api.telegram.org/bot{self.botToken}/getUpdates'
         data = requests.get(site).json()  # reads data from the url getUpdates
-
-        ## Store the update id to compare new messages to 
-        old_update_id = data['result'][0]['update_id'] #replace with -1
-        time = datetime.now() + timedelta(minutes= 480)
-        waitingTime = time + timedelta(seconds=waitTime)
+        
         result = []
+        if (isinstance(data['result'], list)):
+            ## Store the update id to compare new messages to 
+            old_update_id = data['result'][0]['update_id'] #replace with -1
+            time = datetime.now() + timedelta(minutes= 480)
+            waitingTime = time + timedelta(seconds=waitTime)
 
-        while True:
-            if waitingTime < datetime.now() + timedelta(minutes= 480):
-                result = []
-                break
-            data = requests.get(site).json()  # reads data from the url getUpdates
-            if (data['result'] != []):
-                for entry in data['result']:
-                    new_update_id = entry['update_id']
-                    if new_update_id <= old_update_id:
-                        continue
-                    elif new_update_id > old_update_id and 'message' in entry:
-                        chat_id = str(entry['message']['chat']['id'])  # reads chat ID
-                        name = str(entry['message']['chat']['first_name'])  # reads username
-
-                        if 'text' in entry['message']:
-                            text = str(entry['message']['text'])  # reads what they have sent
-                            requests.get(f'https://api.telegram.org/bot{self.botToken}/getUpdates?offset=' + str(new_update_id))
-                            result.append({'first_name': name, 'chat_id': chat_id, 'message': text})
-                            print(result)
+            while True:
+                if waitingTime < datetime.now() + timedelta(minutes= 480):
+                    result = []
+                    break
+                data = requests.get(site).json()  # reads data from the url getUpdates
+                if (data['result'] != []):
+                    for entry in data['result']:
+                        new_update_id = entry['update_id']
+                        if new_update_id <= old_update_id:
                             continue
-                print(result)
-                return result        
+                        elif new_update_id > old_update_id and 'message' in entry:
+                            chat_id = str(entry['message']['chat']['id'])  # reads chat ID
+                            name = str(entry['message']['chat']['first_name'])  # reads username
+
+                            if 'text' in entry['message']:
+                                text = str(entry['message']['text'])  # reads what they have sent
+                                requests.get(f'https://api.telegram.org/bot{self.botToken}/getUpdates?offset=' + str(new_update_id))
+                                result.append({'first_name': name, 'chat_id': chat_id, 'message': text})
+                                print(result)
+                                continue
+                    print(result)
+                    return result        
         return result
         
     """Sends users messages on Telegram Chat"""
