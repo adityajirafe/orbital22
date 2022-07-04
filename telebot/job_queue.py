@@ -92,6 +92,11 @@ class JobQueue:
                 elif job_item.job is Jobs.LISTEN:
                     handle_listen(job_item, self.bot)
                     self.queue.remove(job_item)
+
+                elif job_item.job is Jobs.BALANCE:
+                    handle_balance(job_item, self.bot)
+                    self.queue.remove(job_item)
+                    
                 else:
                     break
         except:
