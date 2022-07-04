@@ -74,6 +74,25 @@ def handle_listen(job_item, bot):
         chat_id
     )
 
+"""Handles users checking their balance in their FTX account"""
+def handle_balance(job_item, bot):
+    chat_id = job_item.chat_id
+    # ftx = bot.auth_users[chat_id]
+    ftx = bot.master_ftxobj
+    balance = ftx.get_balances()
+    mybalance = ''
+    for coin in balance:
+        c = coin['coin']
+        total = coin['total']
+        value = coin['usdValue']
+        if total != 0:
+            sentence = f'{c}\namount: {total}\nvalue: {value} USD\n\n'
+            mybalance = mybalance + sentence
+    
+    print(mybalance)
+    bot.sendText(mybalance, chat_id)
+
+
 """Handles no trade events"""
 def handle_no_trade(job_item, bot):
     print('inside handle no trade')
@@ -117,7 +136,7 @@ def handle_long_trade(job_item, bot, margin):
         try:
             """Retrieves coin price"""
             if (coin not in bot.prices):
-                price_update_single(bot, coin, ftx)
+                price_update_single(bot, coin, bot.master_ftxobj)
             price = bot.prices[coin]
 
             """Checks current positions and closes unfavourable trades"""
@@ -179,7 +198,7 @@ def handle_short_trade(job_item, bot, margin):
         try:
             """Retrieves coin price"""
             if (coin not in bot.prices):
-                price_update_single(bot, coin, ftx)
+                price_update_single(bot, coin, bot.master_ftxobj)
             price = bot.prices[coin]
 
             """Checks current positions and closes unfavourable trades"""            

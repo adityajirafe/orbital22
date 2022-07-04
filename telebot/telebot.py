@@ -17,8 +17,8 @@ load_dotenv()
 
 TOKEN = os.getenv('telegramToken')
 
-FTX_API_KEY = os.getenv('FtxApiKey')
-FTX_API_SECRET = os.getenv('FtxApiSecret')
+FTX_API_KEY = os.getenv('ReadOnlyFtxApiKey')
+FTX_API_SECRET = os.getenv('ReadOnlyFtxApiSecret')
 
 """Constants"""
 COIN_PRICE_UPDATE_FREQ = 10
@@ -83,6 +83,9 @@ def main():
 
                 elif (message == '/listen' and chat_id in bot.auth_users):
                     pending_job = Job_Item(chat_id, message, Jobs.LISTEN)
+                
+                elif (message == '/mybalance' and chat_id in bot.auth_users):
+                    pending_job = Job_Item(chat_id, message, Jobs.BALANCE)
 
                 elif (message == '/logout' and chat_id in bot.auth_users):
                     pending_job = Job_Item(chat_id, message, Jobs.LOGOUT)

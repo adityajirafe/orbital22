@@ -12,3 +12,4 @@ class Jobs(Enum):
     CLOSELONG = 9
     CLOSESHORT = 10
     NOTRADE = 11
+    BALANCE = 12
