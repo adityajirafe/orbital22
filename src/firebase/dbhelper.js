@@ -1,4 +1,4 @@
-import { doc, setDoc, updateDoc, collection } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, collection, getDoc } from 'firebase/firestore';
 import { TRADES } from '../data/trades';
 import { fs } from '../firebase';
 
@@ -56,3 +56,25 @@ export const compareTime = (timeA, timeB) => {
     );
     return formattedTimeB - formattedTimeA;
 };
+
+export const handleFriendRequest = (email, friendEmail) => {
+    const docRef = doc(fs, 'Friends', email);
+    setDoc(docRef, { [friendEmail]: false }, { merge: true });
+
+    const friendRef = doc(fs, 'Friends', friendEmail);
+    setDoc(friendRef, { [email]: false }, { merge: true });
+};
+
+// getDoc(docRef).then((doc) => {
+//     if (doc.exists()) {
+//         let persons = doc.data();
+//         console.log('Document is: ', doc.data());
+//         Object.keys(persons).forEach((username) => {
+//             console.log(username);
+//             setUsers((users) => [...users, username]);
+//         });
+//     } else {
+//         console.log(doc);
+//         console.log('No such document');
+//     }
+// });
