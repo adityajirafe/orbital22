@@ -5,18 +5,22 @@ import React, { useState, useEffect } from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 
-import { HomeScreen, AuthScreen, MainScreen, SignupScreen } from '../screens';
+import {
+    HomeScreen,
+    AuthScreen,
+    MainScreen,
+    SignupScreen,
+    FriendReqScreen,
+} from '../screens';
 import { CustomDrawerContent } from '../components';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import { globalStyles } from '../styles/Styles';
-import CoinValetIcon from '../components/CoinValetIcon';
 import { COLOURS } from '../styles/Colours';
 import PortfolioScreen from '../screens/PortfolioScreen';
 
@@ -99,6 +103,10 @@ const AppNavigator = () => {
         return <PortfolioScreen email={user} />;
     };
 
+    const FriendReqScreenWithUser = () => {
+        return <FriendReqScreen email={user} />;
+    };
+
     const DrawerNavigator = () => {
         return (
             <Drawer.Navigator
@@ -120,6 +128,23 @@ const AppNavigator = () => {
                     },
                 }}
                 drawerContent={(props) => <CustomDrawerContent {...props} />}>
+                <Drawer.Screen
+                    name="friendreq"
+                    options={{
+                        title: 'Add Friends',
+                        headerStyle: { backgroundColor: COLOURS.background },
+                        headerTitleStyle: { fontFamily: 'roboto-bold' },
+                        headerRight: () => <LogoutIcon />,
+                        drawerIcon: () => (
+                            <Icon
+                                name="account-plus"
+                                size={22}
+                                style={{ marginRight: -20 }}
+                            />
+                        ),
+                    }}>
+                    {(props) => <FriendReqScreenWithUser {...props} />}
+                </Drawer.Screen>
                 <Drawer.Screen
                     name="metrics"
                     options={{
