@@ -27,11 +27,11 @@ TRADE_SUGGESTION_FREQ = 1
 
 
 """Initialise Telegram Bot with Token"""
-def initialisation(coins_and_qty, coins, master_ftxobj):
-    return TelegramBot(TOKEN, coins_and_qty, coins, master_ftxobj)
+def initialisation(token, coins_and_qty, coins, master_ftxobj):
+    return TelegramBot(token, coins_and_qty, coins, master_ftxobj)
 
 
-def main():
+def main(bot, coins, interval, ftx, job_queue):
     trade_freq_time = datetime.now() + timedelta(minutes= 480)
     coin_update_time = datetime.now() + timedelta(minutes= 480)
     metrics_update_time = datetime.now() + timedelta(minutes= 480)
@@ -98,6 +98,7 @@ def main():
                         "Invalid input, press /start to use CoinValet or use another valid prompt",
                         chat_id
                     )
+                    print("invalid input")
                     continue
                 
                 """Adds valid pending jobs to the job queue"""
@@ -159,7 +160,7 @@ if __name__ == '__main__':
     ftx = FtxClient(api_key= FTX_API_KEY, api_secret= FTX_API_SECRET)
 
     """Initialise the Telegram bot"""
-    bot = initialisation(coins_and_qty, coins, ftx)
+    bot = initialisation(TOKEN, coins_and_qty, coins, ftx)
     
     """Initialise Firebase authentication"""
     user_auth = firebase.auth
@@ -167,5 +168,5 @@ if __name__ == '__main__':
     """Initialise the Job Queue"""
     job_queue = JobQueue(bot, user_auth)
 
-    main()
+    main(bot, coins, interval, ftx, job_queue)
 

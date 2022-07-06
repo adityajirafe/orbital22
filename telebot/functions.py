@@ -68,11 +68,13 @@ def handle_sleep(job_item, bot):
 """Handles users un-silencing trade suggestions"""
 def handle_listen(job_item, bot):
     chat_id = job_item.chat_id
-    bot.sleep.remove(chat_id)
+    if chat_id in bot.sleep:
+        bot.sleep.remove(chat_id)
     bot.sendText(
         "Listening...",
         chat_id
     )
+    
 
 """Handles users checking their balance in their FTX account"""
 def handle_balance(job_item, bot):
@@ -95,14 +97,13 @@ def handle_balance(job_item, bot):
 
 """Handles no trade events"""
 def handle_no_trade(job_item, bot):
-    print('inside handle no trade')
     chat_id = job_item.chat_id
     coin = job_item.coin
-    print('about to send text')
     bot.sendText(
         f"{coin} trade NOT taken",
         chat_id
     )
+    print('handled no trade')
     return
 
 """checks for enough money in account given the amount required to trade"""
@@ -128,7 +129,6 @@ def handle_long_trade(job_item, bot, margin):
 
     email = bot.chatids[chat_id]
     positions = get_positions(email, coin)
-    print(f"positions: {positions}")
 
     SIZE = bot.coins_and_qty[coin + "-PERP"]
     # if (checkTrade(margin, ftx)): # use for debugging since checkTrade always returns false
@@ -142,16 +142,14 @@ def handle_long_trade(job_item, bot, margin):
             """Checks current positions and closes unfavourable trades"""
             if len(positions) != 0:
                 if handle_close_trade(positions, 'long', email, bot, chat_id):
-                    print("close trade")
                     return    
             # ftx.place_order(market= coin, side= 'buy', price= str(price), type= 'limit', size= SIZE)
             bot.sendText(
                 f"Long trade has been taken\n{coin} at ${price} and {SIZE} units", 
                 chat_id
             )
-            print("after text")
             time = get_time()
-
+            
             """Updates position on firebase"""
             update_position(email, coin, SIZE, 'long', time, price)
             
@@ -190,7 +188,6 @@ def handle_short_trade(job_item, bot, margin):
     email = bot.chatids[chat_id]
     positions = get_positions(email, coin)
 
-    print(bot.coins_and_qty[coin + "-PERP"])
     SIZE = bot.coins_and_qty[coin + "-PERP"]
 
     # if (checkTrade(margin, ftx)): # use for debugging since checkTrade always returns false
@@ -254,12 +251,13 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
         # eg of position: {'name': 'long', 'qty': '0.0083', 'price': '$41,803.43', 'coin': 'BTC', 'value': '$346.97', 'time': '2022-03-01, 16:52:45'}
         qty = position['qty']
         coin = position['coin']
+        name = position['name']
         price = bot.prices[coin]
         
-        if (position['name'] == favoured_trade):
+        if (name == favoured_trade):
             continue
         else:
-            print(f"{coin} {position['name']} opened on {position['time']} has been closed")
+            print(f"{coin} {name} opened has been closed")
             """Sample Output:
             BTC long closed
             BTC short closed
@@ -270,7 +268,7 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
 
             """Update portfolio metrics"""
             sell_value = price * qty
-            profit = upload_realised_profit(email, doc_id, sell_value, position['name'])
+            profit = upload_realised_profit(email, doc_id, sell_value, name)
             update_metrics(bot, bot.coins, bot.master_ftxobj, email)
             """Removes position on firebase"""
             delete_position(email, doc_id) # COMMENT OUT FOR DEBUGGING -> prevent unnecessary deletion of firebase data
@@ -279,7 +277,7 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
             update_trades(
                 email, 
                 coin, 
-                position['name'], 
+                name, 
                 price, 
                 get_time(), 
                 qty, 
@@ -289,7 +287,7 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
             
             print(f"updated metrics after trade closed by {email}")
             bot.sendText(
-                f"{coin} {position['name']} opened on {position['time']} has been closed\nProfit: {profit}", 
+                f"{coin} {name} opened on {position['time']} at {position['price']} has been closed\nProfit: {profit}", 
                 chat_id
             )
             num_trades_closed += 1

@@ -43,7 +43,7 @@ def update_prices(price_list):
     for coin, price in price_list:
         reference = db.document(u'Prices', f"{coin}")
         reference.update({'price' : price})
-        print(f"{coin} updated. price: {price}")
+        print(f"{coin} price updated.")
 
 
 """Used to update trade history of user on firebase"""
