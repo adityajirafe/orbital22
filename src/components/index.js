@@ -10,4 +10,9 @@ export { default as DashBoardItem } from './DashBoardItem';
 export { default as PositionList } from './PositionList';
 export { default as Position } from './Position';
 
+export { default as FriendReqList } from './FriendReqList';
+export { default as FriendReqItem } from './FriendReqItem';
+export { default as FriendReqButton } from './FriendReqButton';
+export { default as PressedFriendReqButton } from './PressedFriendReqButton';
+
 export { default as CustomDrawerContent } from './CustomDrawerContent';

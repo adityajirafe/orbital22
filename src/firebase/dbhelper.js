@@ -1,4 +1,11 @@
-import { doc, setDoc, updateDoc, collection, getDoc } from 'firebase/firestore';
+import {
+    doc,
+    setDoc,
+    updateDoc,
+    collection,
+    getDoc,
+    deleteDoc,
+} from 'firebase/firestore';
 import { TRADES } from '../data/trades';
 import { fs } from '../firebase';
 
@@ -19,13 +26,10 @@ const createTradeTemplate = (username) => {
 
 export const addDummyData = (email) => {
     let len = TRADES.length;
-    console.log(len);
     for (let i = 0; i < len; i++) {
         const trades = TRADES[i];
-        console.log(trades);
         const tradeRef = doc(collection(fs, 'UserPortfolio', email, 'trades'));
         setDoc(tradeRef, trades);
-        console.log('added');
     }
 };
 
@@ -57,12 +61,41 @@ export const compareTime = (timeA, timeB) => {
     return formattedTimeB - formattedTimeA;
 };
 
-export const handleFriendRequest = (email, friendEmail) => {
-    const docRef = doc(fs, 'Friends', email);
-    setDoc(docRef, { [friendEmail]: false }, { merge: true });
+export const handleFriendRequest = (email, friendEmail, requests, cache) => {
+    for (let i = 0; i < requests.length; i++) {
+        if (requests[i].email == friendEmail) {
+            return false;
+        }
+    }
+    if (cache.find((r) => r == friendEmail)) {
+        return false;
+    }
+    // const docRef = doc(fs, 'Friends', 'Requests', email, friendEmail);
+    // const docData = { email: friendEmail, accepted: false };
+    // setDoc(docRef, docData, { merge: true });
 
-    const friendRef = doc(fs, 'Friends', friendEmail);
-    setDoc(friendRef, { [email]: false }, { merge: true });
+    const friendRef = doc(fs, 'Friends', 'Requests', friendEmail, email);
+    const friendData = { email: email, accepted: false };
+    setDoc(friendRef, friendData, { merge: true });
+    return true;
+};
+
+export const acceptFriendRequest = (email, friendEmail) => {
+    const docRef = doc(fs, 'Friends', 'Accepted', email, friendEmail);
+    const docData = { email: friendEmail, accepted: true };
+    setDoc(docRef, docData);
+
+    const docDelRef = doc(fs, 'Friends', 'Requests', email, friendEmail);
+    deleteDoc(docDelRef);
+
+    const friendRef = doc(fs, 'Friends', 'Accepted', friendEmail, email);
+    const friendData = { email: email, accepted: true };
+    setDoc(friendRef, friendData);
+};
+
+export const declineFriendRequest = (email, friendEmail) => {
+    const docDelRef = doc(fs, 'Friends', 'Requests', email, friendEmail);
+    deleteDoc(docDelRef);
 };
 
 // getDoc(docRef).then((doc) => {

@@ -8,7 +8,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, fs } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 import {
     HomeScreen,
@@ -16,6 +17,7 @@ import {
     MainScreen,
     SignupScreen,
     FriendReqScreen,
+    PendingReqScreen,
 } from '../screens';
 import { CustomDrawerContent } from '../components';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -28,7 +30,29 @@ const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
+const useConstructor = (callBack = () => {}) => {
+    const [hasBeenCalled, setHasBeenCalled] = useState(false);
+    if (hasBeenCalled) return;
+    callBack();
+    setHasBeenCalled(true);
+};
+
 const AppNavigator = () => {
+    const [users, setUsers] = useState([]);
+    useConstructor(() => {
+        const docRef = doc(fs, 'Directory/Users');
+        getDoc(docRef).then((doc) => {
+            if (doc.exists()) {
+                let persons = doc.data();
+                Object.keys(persons).forEach((username) => {
+                    // console.log(username);
+                    setUsers((users) => [...users, persons[username]]);
+                });
+            } else {
+                console.log('No such document');
+            }
+        });
+    });
     const [isAuth, setIsAuth] = useState(false);
     const [user, setUser] = useState('demo');
 
@@ -104,7 +128,11 @@ const AppNavigator = () => {
     };
 
     const FriendReqScreenWithUser = () => {
-        return <FriendReqScreen email={user} />;
+        return <FriendReqScreen email={user} users={users} />;
+    };
+
+    const PendingReqScreenWithUser = () => {
+        return <PendingReqScreen email={user} />;
     };
 
     const DrawerNavigator = () => {
@@ -128,23 +156,6 @@ const AppNavigator = () => {
                     },
                 }}
                 drawerContent={(props) => <CustomDrawerContent {...props} />}>
-                <Drawer.Screen
-                    name="friendreq"
-                    options={{
-                        title: 'Add Friends',
-                        headerStyle: { backgroundColor: COLOURS.background },
-                        headerTitleStyle: { fontFamily: 'roboto-bold' },
-                        headerRight: () => <LogoutIcon />,
-                        drawerIcon: () => (
-                            <Icon
-                                name="account-plus"
-                                size={22}
-                                style={{ marginRight: -20 }}
-                            />
-                        ),
-                    }}>
-                    {(props) => <FriendReqScreenWithUser {...props} />}
-                </Drawer.Screen>
                 <Drawer.Screen
                     name="metrics"
                     options={{
@@ -178,6 +189,40 @@ const AppNavigator = () => {
                         ),
                     }}>
                     {(props) => <MainScreenWithUser {...props} />}
+                </Drawer.Screen>
+                <Drawer.Screen
+                    name="friendreq"
+                    options={{
+                        title: 'Add Friends',
+                        headerStyle: { backgroundColor: COLOURS.background },
+                        headerTitleStyle: { fontFamily: 'roboto-bold' },
+                        headerRight: () => <LogoutIcon />,
+                        drawerIcon: () => (
+                            <Icon
+                                name="account-plus"
+                                size={22}
+                                style={{ marginRight: -20 }}
+                            />
+                        ),
+                    }}>
+                    {(props) => <FriendReqScreenWithUser {...props} />}
+                </Drawer.Screen>
+                <Drawer.Screen
+                    name="pendingreq"
+                    options={{
+                        title: 'Friend Requests',
+                        headerStyle: { backgroundColor: COLOURS.background },
+                        headerTitleStyle: { fontFamily: 'roboto-bold' },
+                        headerRight: () => <LogoutIcon />,
+                        drawerIcon: () => (
+                            <Icon
+                                name="email-alert-outline"
+                                size={22}
+                                style={{ marginRight: -20 }}
+                            />
+                        ),
+                    }}>
+                    {(props) => <PendingReqScreenWithUser {...props} />}
                 </Drawer.Screen>
             </Drawer.Navigator>
         );

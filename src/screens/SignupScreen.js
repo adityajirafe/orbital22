@@ -45,7 +45,6 @@ const SignupScreen = () => {
                     setUsers((users) => [...users, username]);
                 });
             } else {
-                console.log(doc);
                 console.log('No such document');
             }
         });
