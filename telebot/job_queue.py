@@ -111,13 +111,13 @@ class JobQueue:
             return
         for chat_id in self.waiting:
             if self.waiting[chat_id]['waiting_time'] < datetime.now() + timedelta(minutes= 480):
-                    print('timeout')
-                    self.bot.sendText(
-                        "Login Timeout. Press /start to restart bot",
-                        chat_id
-                    )
-                    del self.waiting[chat_id]
-                    return
+                print('timeout')
+                self.bot.sendText(
+                    "Login Timeout. Press /start to restart bot",
+                    chat_id
+                )
+                del self.waiting[chat_id]
+                return
                     
         for job_item in self.queue:
             chat_id = job_item.chat_id
