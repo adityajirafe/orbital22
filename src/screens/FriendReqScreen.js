@@ -8,7 +8,7 @@ import {
     Keyboard,
 } from 'react-native';
 import React, { useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { fs } from '../firebase';
 
 import { globalStyles } from '../styles/Styles';
@@ -25,29 +25,30 @@ const useConstructor = (callBack = () => {}) => {
 };
 
 const FriendReqScreen = (props) => {
-    const [users, setUsers] = useState([]);
+    const [requests, setRequests] = useState([]);
+    const { email, users } = props;
+    const [cache, setCache] = useState([]);
     useConstructor(() => {
-        console.log('Rendering screen now');
-
-        const docRef = doc(fs, 'Directory/Users');
-        getDoc(docRef).then((doc) => {
-            if (doc.exists()) {
-                let persons = doc.data();
-                console.log('Document is: ', doc.data());
-                Object.keys(persons).forEach((username) => {
-                    let userEmail = persons[username];
-                    console.log(userEmail);
-                    setUsers((users) => [...users, userEmail]);
-                });
-            } else {
-                console.log(doc);
-                console.log('No such document');
-            }
+        const docRef = collection(fs, 'Friends', 'Requests', email);
+        getDocs(docRef).then((doc) => {
+            doc.forEach((docu) => {
+                // console.log(docu.data());
+                let request = docu.data();
+                setRequests((requests) => [...requests, request]);
+            });
+        });
+        const friendRef = collection(fs, 'Friends', 'Accepted', email);
+        getDocs(friendRef).then((doc) => {
+            doc.forEach((docu) => {
+                let friend = docu.data();
+                setRequests((requests) => [...requests, friend]);
+            });
         });
     });
 
-    const { email } = props;
     const [friend, setFriend] = useState('');
+
+    // console.log(requests);
 
     const restoreForm = () => {
         setFriend('');
@@ -66,14 +67,22 @@ const FriendReqScreen = (props) => {
         Alert.alert("Please enter a friend's email");
     };
 
+    const requestAlreadySentAlert = () => {
+        Alert.alert('Friend request already sent');
+    };
+
     const addFriendHandler = () => {
+        setCache((cache) => [...cache, friend]);
         if (users.find((f) => f == friend)) {
             if (friend == email) {
                 sameEmailAlert();
                 return;
             }
-            handleFriendRequest(email, friend);
-            friendRequestSentAlert();
+            if (handleFriendRequest(email, friend, requests, cache) == true) {
+                friendRequestSentAlert();
+            } else {
+                requestAlreadySentAlert();
+            }
             restoreForm();
             return;
         } else {
