@@ -52,32 +52,53 @@ def main(bot, coins, interval, ftx, job_queue):
                     
                     if (chat_id in bot.sleep):
                         bot.sleep.remove(chat_id)
-
-                    if (chat_id in bot.auth_users):
-                        del bot.auth_users[chat_id]
-                    
-                    pending_job = Job_Item(chat_id, message, Jobs.START)
+                        pending_job = Job_Item(chat_id, message, Jobs.START)
+                    if (chat_id not in bot.auth_users):
+                        # del bot.auth_users[chat_id]
+                        pending_job = Job_Item(chat_id, message, Jobs.START)
+                    else:
+                        bot.sendText('Currently logged in, please press /logout before you can start a new session', chat_id)
 
                 elif (message.startswith('/long_trade') and chat_id in bot.auth_users):
                     current_coin = message.split('_')[2]
-                    pending_job = Job_Item(chat_id, message, Jobs.LONGTRADE, current_coin)
+                    if current_coin + '-PERP' in coins:
+                        pending_job = Job_Item(chat_id, message, Jobs.LONGTRADE, current_coin)
+                    else:
+                        bot.sendText(f'Invalid coin, we only trade\n{coins[0]}\n{coins[1]}\n{coins[2]}\n{coins[3]}', chat_id)
+                        print('invalid coin')
 
                 elif (message.startswith('/short_trade') and chat_id in bot.auth_users):
                     current_coin = message.split('_')[2]
-                    pending_job = Job_Item(chat_id, message, Jobs.SHORTTRADE, current_coin)
-
+                    if current_coin + '-PERP' in coins:
+                        pending_job = Job_Item(chat_id, message, Jobs.SHORTTRADE, current_coin)
+                    else:
+                        bot.sendText(f'Invalid coin, we only trade\n{coins[0]}\n{coins[1]}\n{coins[2]}\n{coins[3]}', chat_id)
+                        print('invalid coin')
+                        
                 elif (message.startswith('/close_long') and chat_id in bot.auth_users):
                     current_coin = message.split('_')[2]
-                    pending_job = Job_Item(chat_id, message, Jobs.CLOSELONG, current_coin)
-                    
+                    if current_coin + '-PERP' in coins:
+                        pending_job = Job_Item(chat_id, message, Jobs.CLOSELONG, current_coin)
+                    else:
+                        bot.sendText(f'Invalid coin, we only trade\n{coins[0]}\n{coins[1]}\n{coins[2]}\n{coins[3]}', chat_id)
+                        print('invalid coin')
+
                 elif (message.startswith('/close_short') and chat_id in bot.auth_users):
                     current_coin = message.split('_')[2]
-                    pending_job = Job_Item(chat_id, message, Jobs.CLOSESHORT, current_coin)
-                
+                    if current_coin + '-PERP' in coins:
+                        pending_job = Job_Item(chat_id, message, Jobs.CLOSESHORT, current_coin)
+                    else:
+                        bot.sendText(f'Invalid coin, we only trade\n{coins[0]}\n{coins[1]}\n{coins[2]}\n{coins[3]}', chat_id)
+                        print('invalid coin')
+
                 elif (message.startswith('/no_trade') and chat_id in bot.auth_users):
                     current_coin = message.split('_')[2]
-                    pending_job = Job_Item(chat_id, message, Jobs.NOTRADE, current_coin)
-
+                    if current_coin + '-PERP' in coins:
+                        pending_job = Job_Item(chat_id, message, Jobs.NOTRADE, current_coin)
+                    else:
+                        bot.sendText(f'Invalid coin, we only trade\n{coins[0]}\n{coins[1]}\n{coins[2]}\n{coins[3]}', chat_id)
+                        print('invalid coin')
+                        
                 elif (message == '/sleep' and chat_id in bot.auth_users):
                     pending_job = Job_Item(chat_id, message, Jobs.SLEEP)
 
