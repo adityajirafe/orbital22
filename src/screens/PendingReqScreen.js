@@ -1,13 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import {
-    View,
-    Text,
-    StyleSheet,
-    KeyboardAvoidingView,
-    Alert,
-    Keyboard,
-} from 'react-native';
-import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { collection, getDocs } from 'firebase/firestore';
 import { fs } from '../firebase';
 
@@ -16,18 +10,12 @@ import { globalStyles } from '../styles/Styles';
 import { COLOURS } from '../styles/Colours';
 import { FriendReqList } from '../components';
 
-const useConstructor = (callBack = () => {}) => {
-    const [hasBeenCalled, setHasBeenCalled] = useState(false);
-    if (hasBeenCalled) return;
-    callBack();
-    setHasBeenCalled(true);
-};
-
 const PendingReqScreen = (props) => {
     const [requests, setRequests] = useState([]);
+    const [isSending, setIsSending] = useState(false);
     const { email } = props;
 
-    useConstructor(() => {
+    const prepare = async () => {
         const docRef = collection(fs, 'Friends', 'Requests', email);
         getDocs(docRef).then((doc) => {
             doc.forEach((docu) => {
@@ -36,14 +24,46 @@ const PendingReqScreen = (props) => {
                 setRequests((requests) => [...requests, request]);
             });
         });
-    });
+    };
+
+    const wait = (timeout) => {
+        return new Promise((resolve) => setTimeout(resolve, timeout));
+    };
+
+    const refresh = () => {
+        setIsSending(true);
+        setRequests([]);
+        prepare();
+        wait(1000).then(() => setIsSending(false));
+    };
+
+    useEffect(() => {
+        setIsSending(true);
+        prepare();
+        setIsSending(false);
+    }, []);
 
     return (
         <View style={globalStyles.container}>
-            {/* <FeatureImage /> */}
             <View style={styles.friendListContainer}>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.title}>Pending Requests</Text>
+                <View style={styles.headerContainer}>
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.title}>Pending Requests</Text>
+                    </View>
+                    <Pressable
+                        title={'Refresh'}
+                        disabled={isSending}
+                        onPress={refresh}>
+                        <Icon
+                            name="refresh"
+                            size={30}
+                            style={{
+                                color: COLOURS.white,
+                                marginTop: 12,
+                                marginLeft: 10,
+                            }}
+                        />
+                    </Pressable>
                 </View>
                 <View style={styles.friendList}>
                     <FriendReqList requests={requests} email={email} />
@@ -67,6 +87,9 @@ const styles = StyleSheet.create({
     addFriendText: {
         // flex: 1,
     },
+    headerContainer: {
+        flexDirection: 'row',
+    },
     addFriendButton: {
         flex: 1,
     },
@@ -85,6 +108,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         borderRadius: 20,
         borderWidth: 2,
+        flex: 1,
     },
     title: {
         fontFamily: 'roboto-bold',

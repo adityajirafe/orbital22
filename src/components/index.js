@@ -15,4 +15,7 @@ export { default as FriendReqItem } from './FriendReqItem';
 export { default as FriendReqButton } from './FriendReqButton';
 export { default as PressedFriendReqButton } from './PressedFriendReqButton';
 
+export { default as FriendPortfolioList } from './FriendPortfolioList';
+export { default as FriendPortfolioCard } from './FriendPortfolioCard';
+
 export { default as CustomDrawerContent } from './CustomDrawerContent';

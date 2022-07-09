@@ -1,6 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
-import React, { useState } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    FlatList,
+    Button,
+    Pressable,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import React, { useState, useEffect } from 'react';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { fs } from '../firebase';
 
@@ -9,32 +17,12 @@ import { globalStyles } from '../styles/Styles';
 import { DashBoard, PositionList } from '../components';
 import { COLOURS } from '../styles/Colours';
 
-const useConstructor = (callBack = () => {}) => {
-    const [hasBeenCalled, setHasBeenCalled] = useState(false);
-    if (hasBeenCalled) return;
-    callBack();
-    setHasBeenCalled(true);
-};
-
 const PortfolioScreen = (props) => {
     const { email } = props;
-    // const [prices, setPrices] = useState([]);
     const [positions, setPositions] = useState([]);
-    const [metrics, setMetrics] = useState([]);
-    useConstructor(() => {
-        // console.log('Rendering screen now');
-        // Demo Account contains empty trades while email loads
-        // const priceRef = collection(fs, 'Prices/');
-        // getDocs(priceRef).then((doc) => {
-        //     doc.forEach((docu) => {
-        //         // console.log(docu.data());
-        //         let price = docu.data();
-        //         // console.log('price', price);
-        //         setPrices((prices) => [...prices, price]);
-        //         // console.log(prices);
-        //     });
-        // });
-        // console.log('prices', prices);
+    const [isSending, setIsSending] = useState(false);
+
+    const prepare = async () => {
         const reference = email
             ? `UserPortfolio/${email}/`
             : 'UserPortfolio/adi/';
@@ -48,20 +36,56 @@ const PortfolioScreen = (props) => {
                 // console.log(positions);
             });
         });
-    });
+    };
+
+    const wait = (timeout) => {
+        return new Promise((resolve) => setTimeout(resolve, timeout));
+    };
+
+    const refresh = () => {
+        setIsSending(true);
+        setPositions([]);
+        prepare();
+        wait(1000).then(() => setIsSending(false));
+    };
+
+    useEffect(() => {
+        setIsSending(true);
+        prepare();
+        setIsSending(false);
+    }, []);
+
     return (
         <View style={globalStyles.container}>
             <View style={styles.portfolioContainer}>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.title}>Current positions</Text>
+                <View style={styles.headerContainer}>
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.title}>Current positions</Text>
+                    </View>
+                    <Pressable
+                        title={'Refresh'}
+                        disabled={isSending}
+                        onPress={refresh}>
+                        <Icon
+                            name="refresh"
+                            size={30}
+                            style={{
+                                color: COLOURS.white,
+                                marginTop: 12,
+                                marginLeft: 10,
+                            }}
+                        />
+                    </Pressable>
                 </View>
                 <View style={styles.positionList}>
                     <PositionList positions={positions} />
                 </View>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.title}>Performance</Text>
+                <View style={styles.dashboardContainer}>
+                    <View style={styles.titleContainer2}>
+                        <Text style={styles.title}>Performance</Text>
+                    </View>
+                    <DashBoard email={email} />
                 </View>
-                <DashBoard email={email} />
             </View>
             <StatusBar style="auto" />
         </View>
@@ -73,6 +97,9 @@ export default PortfolioScreen;
 const styles = StyleSheet.create({
     header: {
         paddingTop: 20,
+    },
+    headerContainer: {
+        flexDirection: 'row',
     },
     portfolioContainer: {
         flex: 1,
@@ -87,7 +114,18 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingBottom: 20,
     },
+    dashboardContainer: {
+        flex: 1.5,
+    },
     titleContainer: {
+        backgroundColor: COLOURS.background,
+        padding: 15,
+        marginBottom: 20,
+        borderRadius: 20,
+        borderWidth: 2,
+        flex: 1,
+    },
+    titleContainer2: {
         backgroundColor: COLOURS.background,
         padding: 15,
         marginBottom: 20,
