@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
-import React, { useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { fs } from '../firebase';
 
@@ -10,36 +10,48 @@ import { NoTradeItem, TradeItem } from '../components';
 import { compareTime } from '../firebase/dbhelper';
 import { COLOURS } from '../styles/Colours';
 
-const useConstructor = (callBack = () => {}) => {
-    const [hasBeenCalled, setHasBeenCalled] = useState(false);
-    if (hasBeenCalled) return;
-    callBack();
-    setHasBeenCalled(true);
-};
-
 const MainScreen = (props) => {
     const { email } = props;
     const [trades, setTrades] = useState([]);
-    useConstructor(() => {
-        // console.log('Rendering screen now');
-        // Demo Account contains empty trades while email loads
+    const [isSending, setIsSending] = useState(false);
+    const [empty, setEmpty] = useState(true);
+
+    const prepare = async () => {
         const reference = email
             ? `UserPortfolio/${email}/trades`
             : 'UserPortfolio/adi/trades';
         const docRef = collection(fs, reference);
-        getDocs(docRef).then((doc) => {
+        await getDocs(docRef).then((doc) => {
+            setEmpty(false);
             doc.forEach((docu) => {
                 // console.log(docu.data());
                 let trade = docu.data();
                 setTrades((trades) => [...trades, trade]);
             });
         });
-    });
+    };
+
+    const wait = (timeout) => {
+        return new Promise((resolve) => setTimeout(resolve, timeout));
+    };
+
+    const refresh = () => {
+        setIsSending(true);
+        setTrades([]);
+        prepare();
+        wait(2000).then(() => setIsSending(false));
+    };
+
+    useEffect(() => {
+        setIsSending(true);
+        prepare();
+        setIsSending(false);
+    }, []);
 
     return (
         <View style={globalStyles.container}>
             <View style={styles.tradeListContainer}>
-                {trades.length == 0 ? (
+                {empty == true ? (
                     <NoTradeItem style={styles.tradeList} />
                 ) : (
                     <FlatList
@@ -47,6 +59,8 @@ const MainScreen = (props) => {
                         data={trades.sort((a, b) =>
                             compareTime(a.time, b.time)
                         )}
+                        onRefresh={refresh}
+                        refreshing={isSending}
                         renderItem={({ item, index }) => {
                             return (
                                 <TradeItem

@@ -18,6 +18,7 @@ import {
     SignupScreen,
     FriendReqScreen,
     PendingReqScreen,
+    FriendPortfolioScreen,
 } from '../screens';
 import { CustomDrawerContent } from '../components';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -127,6 +128,10 @@ const AppNavigator = () => {
         return <PortfolioScreen email={user} />;
     };
 
+    const FriendPortfolioScreenWithUser = () => {
+        return <FriendPortfolioScreen email={user} />;
+    };
+
     const FriendReqScreenWithUser = () => {
         return <FriendReqScreen email={user} users={users} />;
     };
@@ -156,6 +161,23 @@ const AppNavigator = () => {
                     },
                 }}
                 drawerContent={(props) => <CustomDrawerContent {...props} />}>
+                <Drawer.Screen
+                    name="friendPort"
+                    options={{
+                        title: 'CoinValet Hub',
+                        headerStyle: { backgroundColor: COLOURS.background },
+                        headerTitleStyle: { fontFamily: 'roboto-bold' },
+                        headerRight: () => <LogoutIcon />,
+                        drawerIcon: () => (
+                            <Icon
+                                name="chart-areaspline"
+                                size={22}
+                                style={{ marginRight: -20 }}
+                            />
+                        ),
+                    }}>
+                    {(props) => <FriendPortfolioScreenWithUser {...props} />}
+                </Drawer.Screen>
                 <Drawer.Screen
                     name="metrics"
                     options={{

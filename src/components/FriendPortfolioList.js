@@ -4,10 +4,8 @@ import { fs } from '../firebase';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
 import { COLOURS } from '../styles/Colours';
 
-import Position from './Position';
-
-const PositionList = (props) => {
-    const { positions } = props;
+const FriendPortfolioList = (props) => {
+    const { friends } = props;
 
     return (
         <View style={styles.mainContainer}>
@@ -24,7 +22,7 @@ const PositionList = (props) => {
     );
 };
 
-export default PositionList;
+export default FriendPortfolioList;
 
 const styles = StyleSheet.create({
     mainContainer: {
