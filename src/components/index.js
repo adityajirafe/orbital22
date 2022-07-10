@@ -4,6 +4,7 @@ export { default as FeatureImage } from './FeatureImage';
 export { default as CoinValetIcon } from './CoinValetIcon';
 
 export { default as TradeItem } from './TradeItem';
+export { default as TradeItemFriend } from './TradeItemFriend';
 export { default as NoTradeItem } from './NoTradeItem';
 export { default as DashBoard } from './DashBoard';
 export { default as DashBoardItem } from './DashBoardItem';

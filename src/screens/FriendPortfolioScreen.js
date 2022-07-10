@@ -7,39 +7,53 @@ import {
     Alert,
     Keyboard,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { fs } from '../firebase';
 
 import { globalStyles } from '../styles/Styles';
 
 import { COLOURS } from '../styles/Colours';
-import { AuthTextInput, AuthPressable, FeatureImage } from '../components';
+import {
+    AuthTextInput,
+    AuthPressable,
+    FeatureImage,
+    FriendPortfolioList,
+} from '../components';
 import { handleFriendRequest } from '../firebase/dbhelper';
-
-const useConstructor = (callBack = () => {}) => {
-    const [hasBeenCalled, setHasBeenCalled] = useState(false);
-    if (hasBeenCalled) return;
-    callBack();
-    setHasBeenCalled(true);
-};
 
 const FriendPortfolioScreen = (props) => {
     const [friends, setFriends] = useState([]);
+    const [isSending, setIsSending] = useState(false);
     const { email } = props;
 
-    useConstructor(() => {
+    const prepare = async () => {
         const docRef = collection(fs, 'Friends', 'Accepted', email);
-        getDocs(docRef).then((doc) => {
+        await getDocs(docRef).then((doc) => {
             doc.forEach((docu) => {
                 // console.log(docu.data());
                 let friend = docu.data();
                 setFriends((friends) => [...friends, friend]);
             });
         });
-    });
+    };
 
-    console.log(friends);
+    const wait = (timeout) => {
+        return new Promise((resolve) => setTimeout(resolve, timeout));
+    };
+
+    const refresh = () => {
+        setIsSending(true);
+        setFriends([]);
+        prepare();
+        wait(1000).then(() => setIsSending(false));
+    };
+
+    useEffect(() => {
+        setIsSending(true);
+        prepare();
+        setIsSending(false);
+    }, []);
 
     return (
         <View style={globalStyles.container}>
@@ -50,8 +64,9 @@ const FriendPortfolioScreen = (props) => {
                         globalStyles.boldText,
                         styles.addFriendText,
                     ]}>
-                    {`Add your friends and follow their portfolios!`}
+                    {`View your friend's portfolios!`}
                 </Text>
+                <FriendPortfolioList friends={friends} />
             </View>
             <StatusBar style="auto" />
         </View>
