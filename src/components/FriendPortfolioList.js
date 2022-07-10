@@ -3,6 +3,7 @@ import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { fs } from '../firebase';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
 import { COLOURS } from '../styles/Colours';
+import FriendPortfolioCard from './FriendPortfolioCard';
 
 const FriendPortfolioList = (props) => {
     const { friends } = props;
@@ -11,10 +12,12 @@ const FriendPortfolioList = (props) => {
         <View style={styles.mainContainer}>
             <FlatList
                 style={styles.positionList}
-                data={positions}
-                renderItem={({ item, index, prices }) => {
+                data={friends}
+                horizontal={true}
+                renderItem={({ item, index }) => {
                     return (
-                        <Position item={item} index={index} price={prices} />
+                        // <Position item={item} index={index} price={prices} />
+                        <FriendPortfolioCard email={item.email} />
                     );
                 }}
             />
@@ -27,5 +30,7 @@ export default FriendPortfolioList;
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
+
+        // backgroundColor: 'white',
     },
 });

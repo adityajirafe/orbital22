@@ -95,9 +95,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLOURS.secondary,
     },
-    tradeEntry: {
-        padding: 20,
-    },
     tradeItem: {
         borderRadius: 20,
     },
@@ -108,5 +105,4 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
     },
-    widget: {},
 });

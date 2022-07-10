@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { COLOURS } from '../styles/Colours';
 import { globalStyles } from '../styles/Styles';
 
-const TradeItem = (props) => {
+const TradeItemFriend = (props) => {
     const { item, index } = props;
     return (
         <View style={styles.mainContainer}>
@@ -24,9 +24,6 @@ const TradeItem = (props) => {
                 <Text style={styles.text}>
                     Units: {'\n' + parseFloat(item.units).toFixed(3)}
                 </Text>
-                <Text style={styles.text}>
-                    Price: {'\n' + parseFloat(item.price).toFixed(3)}
-                </Text>
                 <Text style={[styles.value, styles.green]}>
                     Value: {'\n' + parseFloat(item.value).toFixed(3)}
                 </Text>
@@ -42,7 +39,7 @@ const TradeItem = (props) => {
     );
 };
 
-export default TradeItem;
+export default TradeItemFriend;
 
 const styles = StyleSheet.create({
     mainContainer: {

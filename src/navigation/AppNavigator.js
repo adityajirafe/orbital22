@@ -178,7 +178,7 @@ const AppNavigator = () => {
                     }}>
                     {(props) => <FriendPortfolioScreenWithUser {...props} />}
                 </Drawer.Screen>
-                <Drawer.Screen
+                {/* <Drawer.Screen
                     name="metrics"
                     options={{
                         title: 'Portfolio',
@@ -245,7 +245,7 @@ const AppNavigator = () => {
                         ),
                     }}>
                     {(props) => <PendingReqScreenWithUser {...props} />}
-                </Drawer.Screen>
+                </Drawer.Screen> */}
             </Drawer.Navigator>
         );
     };
