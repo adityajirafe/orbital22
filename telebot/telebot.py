@@ -41,15 +41,15 @@ def main(bot, coins, interval, ftx, job_queue):
         try:
             print("polling")
             result = bot.TelebotPoll(10)
-            
+
             for input in result:
                 message = input['message']
                 chat_id = input['chat_id']
                 name = input['first_name']
                 pending_job = None
                 
+                print('input')
                 if (message == '/start'):
-                    
                     if (chat_id in bot.sleep):
                         bot.sleep.remove(chat_id)
                         pending_job = Job_Item(chat_id, message, Jobs.START)
@@ -61,16 +61,28 @@ def main(bot, coins, interval, ftx, job_queue):
 
                 elif (message.startswith('/long_trade') and chat_id in bot.auth_users):
                     current_coin = message.split('_')[2]
+                    favoured_trade = detect_trade(current_coin + '-PERP', interval, ftx)['type']
+                    
                     if current_coin + '-PERP' in coins:
-                        pending_job = Job_Item(chat_id, message, Jobs.LONGTRADE, current_coin)
+                        if favoured_trade == 'LONG':
+                            pending_job = Job_Item(chat_id, message, Jobs.LONGTRADE, current_coin)
+                        else:
+                            bot.sendText('Cannot take long trade when favoured trade is short', chat_id)
+                            print('Cannot take long trade when favoured trade is short')
                     else:
                         bot.sendText(f'Invalid coin, we only trade\n{coins[0]}\n{coins[1]}\n{coins[2]}\n{coins[3]}', chat_id)
                         print('invalid coin')
 
                 elif (message.startswith('/short_trade') and chat_id in bot.auth_users):
                     current_coin = message.split('_')[2]
+                    favoured_trade = detect_trade(current_coin + '-PERP', interval, ftx)['type']
+
                     if current_coin + '-PERP' in coins:
-                        pending_job = Job_Item(chat_id, message, Jobs.SHORTTRADE, current_coin)
+                        if favoured_trade == 'SHORT':
+                            pending_job = Job_Item(chat_id, message, Jobs.SHORTTRADE, current_coin)
+                        else:
+                            bot.sendText('Cannot take short trade when favoured trade is long', chat_id)
+                            print('Cannot take short trade when favoured trade is long')
                     else:
                         bot.sendText(f'Invalid coin, we only trade\n{coins[0]}\n{coins[1]}\n{coins[2]}\n{coins[3]}', chat_id)
                         print('invalid coin')
@@ -163,7 +175,7 @@ def main(bot, coins, interval, ftx, job_queue):
             print("ERROR in Main Loop")
             print(job_queue.queue)
             sleep(10)
-            pass
+            continue
 
 
 

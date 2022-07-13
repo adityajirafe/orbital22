@@ -247,6 +247,7 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
         order_type = 'buy'
     elif favoured_trade == 'short':
         order_type = 'sell'
+    
     for doc_id, position in positions:
         # eg of position: {'name': 'long', 'qty': '0.0083', 'price': '$41,803.43', 'coin': 'BTC', 'value': '$346.97', 'time': '2022-03-01, 16:52:45'}
         qty = position['qty']
@@ -255,7 +256,14 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
         price = bot.prices[coin]
         
         if (name == favoured_trade):
-            continue
+            if favoured_trade == 'long':
+                bot.sendText('No open short positions', chat_id)
+                print('No open short positions')
+                continue
+            else:
+                bot.sendText('No open long positions', chat_id)
+                print('No open long positions')
+                continue
         else:
             print(f"{coin} {name} opened has been closed")
             """Sample Output:

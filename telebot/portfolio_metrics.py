@@ -184,33 +184,27 @@ def set_24h_profits(profits, email):
         """Upload numeric 24h profit"""
         daily_profit_data = {'value': daily_profit}
         override_metric(email, 'daily_PnL', daily_profit_data)
-        print('dailyPnL done')
 
         """Upload percentage 24h profit"""
         upload_daily_profits_percentage(email, daily_profit)
-        print('dailyPnLPercent done')
 
         """Overwrite ytd profits"""
         ytd_profit_data = {'value': unrealised_profits}
         override_metric(email, 'ytd_PnL', ytd_profit_data)
-        print('ytdPnL done')
 
     else:
         print("not enough data")
         """Upload numeric 24h profit"""
         daily_profit_data = {'value': 'NA'}
         override_metric(email, 'daily_PnL', daily_profit_data)
-        print('dailyPnL done')
 
         """Upload percentage 24h profit"""
         daily_percent_data = {'value': 'NA'}
         override_metric(email, 'daily_PnL_percentage', daily_percent_data)
-        print('dailyPnLPercent done')
 
         """Overwrite ytd profits"""
         ytd_profit_data = {'value': unrealised_profits}
         override_metric(email, 'ytd_PnL', ytd_profit_data)
-        print('ytdPnL done')
     
     return 
 
@@ -223,21 +217,19 @@ def update_metrics(bot, coins, ftx, email):
     best_position = get_best_position(profits, email)
     best_position_data = {'value': best_position[1], 'coin': best_position[0]}
     override_metric(email, 'best_position', best_position_data)
-    print('best position done')
     
     """Finds and uploads worst position held by user onto firestore"""
     worst_position = get_worst_position(profits, email)
     worst_position_data = {'value': worst_position[1], 'coin': worst_position[0]}
     override_metric(email, 'worst_position', worst_position_data)
-    print('worst position done')
-
+    
     """Finds and uploads all time profits onto firestore"""
     set_all_time_profits(profits, email)
-    print('all time done')
 
     """Finds and uploads 24h profits onto firestore"""
     set_24h_profits(profits, email)
-    print('daily done')
+
+    print('metrics updated')
 
     return 
 
