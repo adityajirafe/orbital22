@@ -54,35 +54,44 @@ class JobQueue:
                     self.queue.remove(job_item)
 
                 elif job_item.job is Jobs.LONGTRADE:
-                    handle_long_trade(job_item, self.bot, self.margin)
+                    handle_long_trade(job_item, self.bot, self.margin, job_item.favoured_trade)
                     self.queue.remove(job_item)
 
                 elif job_item.job is Jobs.SHORTTRADE:
-                    handle_short_trade(job_item, self.bot, self.margin)
+                    handle_short_trade(job_item, self.bot, self.margin, job_item.favoured_trade)
                     self.queue.remove(job_item)
 
                 elif job_item.job is Jobs.CLOSELONG:
                     chat_id = job_item.chat_id
                     email = self.bot.chatids[job_item.chat_id]
                     coin = job_item.coin
-                    positions = get_positions(email, coin)
-                    if positions == []:
-                        self.bot.sendText(f'No {coin} positions opened', chat_id)
-                        print(f'No {coin} positions opened')
+                    
+                    if coin + "-PERP" not in self.bot.coins:
+                        self.bot.sendText(f'Invalid coin, we only trade\n{self.bot.coins[0]}\n{self.bot.coins[1]}\n{self.bot.coins[2]}\n{self.bot.coins[3]}', chat_id)
+                        print('invalid coin')
                     else:
-                        handle_close_trade(positions, 'short', email, self.bot, chat_id)
+                        positions = get_positions(email, coin)
+                        if positions == []:
+                            self.bot.sendText(f'No {coin} positions opened', chat_id)
+                            print(f'No {coin} positions opened')
+                        else:
+                            handle_close_trade(positions, 'short', email, self.bot, chat_id)
                     self.queue.remove(job_item)
                 
                 elif job_item.job is Jobs.CLOSESHORT:
                     chat_id = job_item.chat_id
                     email = self.bot.chatids[job_item.chat_id]
                     coin = job_item.coin
-                    positions = get_positions(email, coin)
-                    if positions == []:
-                        self.bot.sendText(f'No {coin} positions opened', chat_id)
-                        print(f'No {coin} positions opened')
+                    if coin + "-PERP" not in self.bot.coins:
+                        self.bot.sendText(f'Invalid coin, we only trade\n{self.bot.coins[0]}\n{self.bot.coins[1]}\n{self.bot.coins[2]}\n{self.bot.coins[3]}', chat_id)
+                        print('invalid coin')
                     else:
-                        handle_close_trade(positions, 'long', email, self.bot, chat_id)
+                        positions = get_positions(email, coin)
+                        if positions == []:
+                            self.bot.sendText(f'No {coin} positions opened', chat_id)
+                            print(f'No {coin} positions opened')
+                        else:
+                            handle_close_trade(positions, 'long', email, self.bot, chat_id)
                     self.queue.remove(job_item)
 
                 elif job_item.job is Jobs.NOTRADE:
