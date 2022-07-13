@@ -66,7 +66,11 @@ class JobQueue:
                     email = self.bot.chatids[job_item.chat_id]
                     coin = job_item.coin
                     positions = get_positions(email, coin)
-                    handle_close_trade(positions, 'short', email, self.bot, chat_id)
+                    if positions == []:
+                        self.bot.sendText(f'No {coin} positions opened', chat_id)
+                        print(f'No {coin} positions opened')
+                    else:
+                        handle_close_trade(positions, 'short', email, self.bot, chat_id)
                     self.queue.remove(job_item)
                 
                 elif job_item.job is Jobs.CLOSESHORT:
@@ -74,7 +78,11 @@ class JobQueue:
                     email = self.bot.chatids[job_item.chat_id]
                     coin = job_item.coin
                     positions = get_positions(email, coin)
-                    handle_close_trade(positions, 'long', email, self.bot, chat_id)
+                    if positions == []:
+                        self.bot.sendText(f'No {coin} positions opened', chat_id)
+                        print(f'No {coin} positions opened')
+                    else:
+                        handle_close_trade(positions, 'long', email, self.bot, chat_id)
                     self.queue.remove(job_item)
 
                 elif job_item.job is Jobs.NOTRADE:
