@@ -1,4 +1,6 @@
 import os
+
+from charset_normalizer import detect
 import firebaseconfig as firebase
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
@@ -89,44 +91,123 @@ class Test(unittest.TestCase):
         self.assertIsInstance(detect_trade(coins[0], interval, ftx), dict)
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
-    def assert_notrade(self, job_item, expected_output, mock_stdout):
-        handle_no_trade(job_item, bot)
+    def assert_notrade(self, expected_output, mock_stdout):
+        job_item = Job_Item(CHAT_ID, "/no_trade_RUNE", Jobs.NOTRADE, "RUNE")
+        job_queue.push_job(job_item)
+        job_queue.execute()
         self.assertEqual(mock_stdout.getvalue(), expected_output)
 
     """Test if the bot is able to handle no trade commands"""
     def test_no_trade(self):
         # The actual test
-        job_item = Job_Item(CHAT_ID, "/no_trade_RUNE", Jobs.NOTRADE, "RUNE")
-        self.assert_notrade(job_item, 'handled no trade\n')     
+        self.assert_notrade('handled no trade\n')     
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
-    def assert_long_trade(self, bot, margin, expected_output, mock_stdout):
-        job_item = Job_Item(CHAT_ID, "/long_trade_RUNE", Jobs.LONGTRADE, "RUNE")
+    def assert_trade(self, type, bot, margin, expected_output, mock_stdout):
         bot.auth_users = {CHAT_ID: ftx}
         bot.chatids = {CHAT_ID: "test@gmail.com"}
-        handle_long_trade(job_item, bot, margin)
+        if type == 'LONG':
+            job_item = Job_Item(CHAT_ID, "/long_trade_RUNE", Jobs.LONGTRADE, "RUNE", type)
+        elif type == 'SHORT':
+            job_item = Job_Item(CHAT_ID, "/short_trade_RUNE", Jobs.SHORTTRADE, "RUNE", type)
+        job_queue.push_job(job_item)
+        job_queue.execute()
         self.assertEqual(mock_stdout.getvalue(), expected_output)
         
-    """Test if the bot is able to open a long position"""
-    def test_long_trade(self):
+    """Test if the bot is able to open a position based on the detected trade"""
+    def test_trade(self):
         # The actual test
         margin = 1
-        self.assert_long_trade(bot, margin, 'RUNE price updated.\n/long_trade_RUNE\n')
+        type = detect_trade(coins[0], interval, ftx)['type']
+        if type == 'LONG':
+            self.assert_trade('LONG', bot, margin, '/long_trade_RUNE\n')
+        elif type == 'SHORT':
+            self.assert_trade('SHORT', bot, margin, '/short_trade_RUNE\n')
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
-    def assert_open_short_with_long_pos(self, bot, margin, expected_output, mock_stdout):
-        job_item = Job_Item(CHAT_ID, "/short_trade_RUNE", Jobs.SHORTTRADE, "RUNE")
+    def assert_trade_with_opposite_pos(self, opened_trade, bot, margin, expected_output, mock_stdout):
         bot.auth_users = {CHAT_ID: ftx}
         bot.chatids = {CHAT_ID: "test@gmail.com"}
-        handle_short_trade(job_item, bot, margin)
+        if opened_trade == 'LONG':
+            job_item = Job_Item(CHAT_ID, "/short_trade_RUNE", Jobs.SHORTTRADE, "RUNE", "SHORT")
+        elif opened_trade == 'SHORT':
+            job_item = Job_Item(CHAT_ID, "/long_trade_RUNE", Jobs.LONGTRADE, "RUNE", "LONG")
+
+        job_queue.push_job(job_item)
+        job_queue.execute()
         self.assertEqual(mock_stdout.getvalue(), expected_output)
 
-    """Test if the bot is able to close a long position when the command to open a short position is given"""
-    def test_open_short_with_long_pos(self):
+    """Test if the bot is able to close a position when the command to open a position in the opposite direction is given"""
+    def test_close_pos_with_opened_opposite_pos(self):
         # The actual test
         margin = 1
-        self.assert_open_short_with_long_pos(bot, margin, 'RUNE long opened has been closed\nstart pulling prices\nbest position done\nworst position done\nall time done\ndailyPnL done\ndailyPnLPercent done\nytdPnL done\ndaily done\nupdated metrics after trade closed by test@gmail.com\n')
+        type = get_positions("test@gmail.com", "RUNE")[0][1]['name']
+        if type == 'long':
+            self.assert_trade_with_opposite_pos('LONG', bot, margin, 'RUNE long opened has been closed\nstart pulling prices\nmetrics updated\nupdated metrics after trade closed by test@gmail.com\n')
+        elif type == 'short':
+            self.assert_trade_with_opposite_pos('SHORT', bot, margin, 'RUNE short opened has been closed\nstart pulling prices\nmetrics updated\nupdated metrics after trade closed by test@gmail.com\n')
+    
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def assert_trade_opposite_favour(self, bot, expected_output, mock_stdout):
+        bot.auth_users = {CHAT_ID: ftx}
+        bot.chatids = {CHAT_ID: "test@gmail.com"}
+        job_item_1 = Job_Item(CHAT_ID, "/short_trade_RUNE", Jobs.SHORTTRADE, "RUNE", "LONG")
+        job_item_2 = Job_Item(CHAT_ID, "/long_trade_RUNE", Jobs.LONGTRADE, "RUNE", "SHORT")
+        job_queue.push_job(job_item_1)
+        job_queue.push_job(job_item_2)
+        job_queue.execute()
+        self.assertEqual(mock_stdout.getvalue(), expected_output)
 
+    '''Test if the trade will not be taken because the favoured trade is opposite of the command'''
+    def test_trade_opposite_favour(self):
+        self.assert_trade_opposite_favour(bot, "Cannot take short trade when favoured trade is long\nCannot take long trade when favoured trade is short\n")
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def assert_close_empty_position(self, bot, expected_output, mock_stdout):
+        bot.auth_users = {CHAT_ID: ftx}
+        bot.chatids = {CHAT_ID: "test@gmail.com"}
+        job_item_1 = Job_Item(CHAT_ID, "/close_short_SOL", Jobs.CLOSESHORT, "SOL")
+        job_item_2 = Job_Item(CHAT_ID, "/close_long_SOL", Jobs.CLOSELONG, "SOL")
+        job_queue.push_job(job_item_1)
+        job_queue.push_job(job_item_2)
+        job_queue.execute()
+        self.assertEqual(mock_stdout.getvalue(), expected_output)
+
+    '''Test if the bot is able to detect that there are no open positions that the user is trying to close'''
+    def test_close_empty_position(self):
+        self.assert_close_empty_position(bot, "No SOL positions opened\nNo SOL positions opened\n")
+    
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def assert_close_empty_long_position(self, bot, expected_output, mock_stdout):
+        bot.auth_users = {CHAT_ID: ftx}
+        bot.chatids = {CHAT_ID: "test@gmail.com"}
+        bot.update_coin_prices("ETH", "1200")
+        job_item_1 = Job_Item(CHAT_ID, "/close_long_ETH", Jobs.CLOSELONG, "ETH")
+        job_queue.push_job(job_item_1)
+        job_queue.execute()
+        self.assertEqual(mock_stdout.getvalue(), expected_output)
+
+    def test_close_empty_long_position(self):
+        self.assert_close_empty_long_position(bot, "No open ETH long positions\n")
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def assert_invalid_coin(self, bot, expected_output, mock_stdout):
+        bot.auth_users = {CHAT_ID: ftx}
+        bot.chatids = {CHAT_ID: "test@gmail.com"}
+        job_item_1 = Job_Item(CHAT_ID, "/short_trade_DOGE", Jobs.SHORTTRADE, "DOGE")
+        job_item_2 = Job_Item(CHAT_ID, "/long_trade_DOGE", Jobs.LONGTRADE, "DOGE")
+        job_item_3 = Job_Item(CHAT_ID, "/close_short_DOGE", Jobs.CLOSESHORT, "DOGE")
+        job_item_4 = Job_Item(CHAT_ID, "/close_long_DOGE", Jobs.CLOSELONG, "DOGE")
+        job_queue.push_job(job_item_1)
+        job_queue.push_job(job_item_2)
+        job_queue.push_job(job_item_3)
+        job_queue.push_job(job_item_4)
+        job_queue.execute()
+        self.assertEqual(mock_stdout.getvalue(), expected_output)
+
+    '''Test if the coin in the command is one of the coins traded'''
+    def test_invalid_coin(self):
+        self.assert_invalid_coin(bot, "invalid coin\ninvalid coin\ninvalid coin\ninvalid coin\n")
 
 if __name__ == '__main__':
     unittest.main()

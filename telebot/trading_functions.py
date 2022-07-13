@@ -151,18 +151,13 @@ def detect_trade(coin, interval, ftx) -> dict:
 
     last_entry_index = len(df) - 1
     price = df['close'][last_entry_index]
-
-    print(f"Price of {coin} is {price}")
-
+    
     EMA_10 = df['10EMA'][last_entry_index]
     EMA_25 = df['25EMA'][last_entry_index]
 
     if EMA_10 > EMA_25:
-        print('detected favour long')
         return {'type': "LONG", 'price': price}
     elif EMA_10 < EMA_25:
-        print('detected favour short')
         return {'type': "SHORT", 'price': price}
     else: 
-        print('detected no trade')
         return{'type': "NO_TRADE", 'price': price}
