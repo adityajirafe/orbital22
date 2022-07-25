@@ -56,6 +56,7 @@ const AppNavigator = () => {
     });
     const [isAuth, setIsAuth] = useState(false);
     const [user, setUser] = useState('demo');
+    // console.log(users);
 
     useEffect(() => {
         const unsubscribeAuthStateChanged = onAuthStateChanged(

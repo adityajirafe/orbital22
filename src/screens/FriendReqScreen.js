@@ -8,7 +8,7 @@ import {
     Keyboard,
 } from 'react-native';
 import React, { useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { fs } from '../firebase';
 
 import { globalStyles } from '../styles/Styles';
@@ -26,7 +26,8 @@ const useConstructor = (callBack = () => {}) => {
 
 const FriendReqScreen = (props) => {
     const [requests, setRequests] = useState([]);
-    const { email, users } = props;
+    const { email } = props;
+    const [users, setUsers] = useState([]);
     const [cache, setCache] = useState([]);
     useConstructor(() => {
         const docRef = collection(fs, 'Friends', 'Requests', email);
@@ -44,11 +45,23 @@ const FriendReqScreen = (props) => {
                 setRequests((requests) => [...requests, friend]);
             });
         });
+        const userDocRef = doc(fs, 'Directory/Users');
+        getDoc(userDocRef).then((doc) => {
+            if (doc.exists()) {
+                let persons = doc.data();
+                Object.keys(persons).forEach((username) => {
+                    // console.log(username);
+                    setUsers((users) => [...users, persons[username]]);
+                });
+            } else {
+                console.log('No such document');
+            }
+        });
     });
 
     const [friend, setFriend] = useState('');
 
-    // console.log(requests);
+    // console.log(users);
 
     const restoreForm = () => {
         setFriend('');
@@ -72,13 +85,22 @@ const FriendReqScreen = (props) => {
     };
 
     const addFriendHandler = () => {
-        setCache((cache) => [...cache, friend]);
-        if (users.find((f) => f == friend)) {
-            if (friend == email) {
+        setCache((cache) => [...cache, friend.toLowerCase()]);
+        // console.log(friend.toLowerCase());
+        // console.log(requests);
+        if (users.find((f) => f == friend.toLowerCase())) {
+            if (friend.toLowerCase() == email) {
                 sameEmailAlert();
                 return;
             }
-            if (handleFriendRequest(email, friend, requests, cache) == true) {
+            if (
+                handleFriendRequest(
+                    email,
+                    friend.toLowerCase(),
+                    requests,
+                    cache
+                ) == true
+            ) {
                 friendRequestSentAlert();
             } else {
                 requestAlreadySentAlert();
