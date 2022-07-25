@@ -162,23 +162,6 @@ const AppNavigator = () => {
                 }}
                 drawerContent={(props) => <CustomDrawerContent {...props} />}>
                 <Drawer.Screen
-                    name="friendPort"
-                    options={{
-                        title: 'CoinValet Hub',
-                        headerStyle: { backgroundColor: COLOURS.background },
-                        headerTitleStyle: { fontFamily: 'roboto-bold' },
-                        headerRight: () => <LogoutIcon />,
-                        drawerIcon: () => (
-                            <Icon
-                                name="chart-areaspline"
-                                size={22}
-                                style={{ marginRight: -20 }}
-                            />
-                        ),
-                    }}>
-                    {(props) => <FriendPortfolioScreenWithUser {...props} />}
-                </Drawer.Screen>
-                {/* <Drawer.Screen
                     name="metrics"
                     options={{
                         title: 'Portfolio',
@@ -213,6 +196,23 @@ const AppNavigator = () => {
                     {(props) => <MainScreenWithUser {...props} />}
                 </Drawer.Screen>
                 <Drawer.Screen
+                    name="friendPort"
+                    options={{
+                        title: 'CoinValet Hub',
+                        headerStyle: { backgroundColor: COLOURS.background },
+                        headerTitleStyle: { fontFamily: 'roboto-bold' },
+                        headerRight: () => <LogoutIcon />,
+                        drawerIcon: () => (
+                            <Icon
+                                name="chart-areaspline"
+                                size={22}
+                                style={{ marginRight: -20 }}
+                            />
+                        ),
+                    }}>
+                    {(props) => <FriendPortfolioScreenWithUser {...props} />}
+                </Drawer.Screen>
+                <Drawer.Screen
                     name="friendreq"
                     options={{
                         title: 'Add Friends',
@@ -245,7 +245,7 @@ const AppNavigator = () => {
                         ),
                     }}>
                     {(props) => <PendingReqScreenWithUser {...props} />}
-                </Drawer.Screen> */}
+                </Drawer.Screen>
             </Drawer.Navigator>
         );
     };

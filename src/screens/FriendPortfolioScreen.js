@@ -1,12 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import {
-    View,
-    Text,
-    StyleSheet,
-    KeyboardAvoidingView,
-    Alert,
-    Keyboard,
-} from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { fs } from '../firebase';
@@ -58,14 +52,31 @@ const FriendPortfolioScreen = (props) => {
     return (
         <View style={globalStyles.container}>
             <View style={styles.portfolioContainer}>
-                <Text
-                    style={[
-                        globalStyles.welcomeText,
-                        globalStyles.boldText,
-                        styles.addFriendText,
-                    ]}>
-                    {`View your friend's portfolios!`}
-                </Text>
+                <View style={styles.headerContainer}>
+                    <Text
+                        style={[
+                            globalStyles.welcomeText,
+                            globalStyles.boldText,
+                            styles.addFriendText,
+                        ]}>
+                        {`View your friend's portfolios!`}
+                    </Text>
+                    <Pressable
+                        title={'Refresh'}
+                        disabled={isSending}
+                        onPress={refresh}
+                        style={styles.refreshButton}>
+                        <Icon
+                            name="refresh"
+                            size={24}
+                            style={{
+                                color: COLOURS.white,
+                                flex: 1,
+                                marginTop: 10,
+                            }}
+                        />
+                    </Pressable>
+                </View>
                 <FriendPortfolioList friends={friends} />
             </View>
             <StatusBar style="auto" />
@@ -85,10 +96,21 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 40,
     },
+    headerContainer: {
+        flex: 0.08,
+        flexDirection: 'row',
+    },
     addFriendText: {
-        // flex: 1,
+        flex: 1,
+        fontSize: '18',
     },
     addFriendButton: {
         flex: 1,
+    },
+    refreshButton: {
+        flex: 0.15,
+        alignContent: 'center',
+        justifyContent: 'center',
+        marginTop: -10,
     },
 });
