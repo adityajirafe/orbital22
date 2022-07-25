@@ -39,7 +39,7 @@ const AuthScreen = () => {
             .then((userCredentials) => {
                 const user = userCredentials.user;
 
-                console.log(user);
+                // console.log(user);
 
                 restoreForm();
             })

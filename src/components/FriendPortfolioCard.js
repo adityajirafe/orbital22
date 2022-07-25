@@ -99,7 +99,7 @@ const FriendPortfolioCard = (props) => {
                             style={{
                                 color: COLOURS.black,
                                 flex: 1,
-                                marginTop: 10,
+                                marginTop: 1,
                             }}
                         />
                     </Pressable>

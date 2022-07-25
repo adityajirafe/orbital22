@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     },
     addFriendText: {
         flex: 1,
-        fontSize: '18',
+        fontSize: 18,
     },
     addFriendButton: {
         flex: 1,

@@ -83,6 +83,8 @@ const SignupScreen = () => {
 
     const signUpHandler = async () => {
         console.log(users);
+        let adjustedEmail = email.toLowerCase();
+        let adjustedUsername = username.toLowerCase();
         if (
             email.length === 0 ||
             password.length === 0 ||
@@ -92,14 +94,14 @@ const SignupScreen = () => {
             return;
         }
 
-        await createUserWithEmailAndPassword(auth, email, password)
+        await createUserWithEmailAndPassword(auth, adjustedEmail, password)
             .then((userCredentials) => {
                 const user = userCredentials.user;
 
                 // To show the user object returned
                 console.log(user);
-                var newUsername = username;
-                var newEmail = email;
+                var newUsername = adjustedUsername;
+                var newEmail = adjustedEmail;
 
                 createUser(newUsername, newEmail);
 
