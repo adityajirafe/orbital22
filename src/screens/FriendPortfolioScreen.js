@@ -8,12 +8,7 @@ import { fs } from '../firebase';
 import { globalStyles } from '../styles/Styles';
 
 import { COLOURS } from '../styles/Colours';
-import {
-    AuthTextInput,
-    AuthPressable,
-    FeatureImage,
-    FriendPortfolioList,
-} from '../components';
+import { FriendPortfolioList } from '../components';
 import { handleFriendRequest } from '../firebase/dbhelper';
 
 const FriendPortfolioScreen = (props) => {
