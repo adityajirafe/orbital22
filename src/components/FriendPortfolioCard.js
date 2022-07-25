@@ -21,8 +21,6 @@ const FriendPortfolioCard = (props) => {
     const [trades, setTrades] = useState([]);
     const [isSending, setIsSending] = useState(false);
     const [empty, setEmpty] = useState(true);
-    const [expanded, setExpanded] = useState(false);
-    const [isExpanding, setIsExpanding] = useState(false);
 
     const prepare = async () => {
         const reference = email
@@ -80,13 +78,6 @@ const FriendPortfolioCard = (props) => {
         wait(1000).then(() => setIsSending(false));
     };
 
-    const expand = () => {
-        console.log('expanding');
-        setIsExpanding(true);
-        setExpanded(true);
-        wait(1000).then(() => setIsExpanding(false));
-    };
-
     useEffect(() => {
         setIsSending(true);
         prepare();
@@ -104,7 +95,7 @@ const FriendPortfolioCard = (props) => {
                         onPress={refresh}>
                         <Icon
                             name="refresh"
-                            size={25}
+                            size={23}
                             style={{
                                 color: COLOURS.black,
                                 flex: 1,
@@ -118,13 +109,6 @@ const FriendPortfolioCard = (props) => {
                         <View style={styles.titleContainer}>
                             <View style={styles.titleContainer2}>
                                 <Text style={styles.title}>{email}</Text>
-                            </View>
-                        </View>
-                        <View style={styles.expandButtonContainer}>
-                            <View style={styles.expandButton}>
-                                <Pressable title={'expand'} onPress={expand}>
-                                    <Text style={styles.button}>Expand</Text>
-                                </Pressable>
                             </View>
                         </View>
                     </View>
@@ -310,7 +294,7 @@ const styles = StyleSheet.create({
     },
     titleContainer2: {
         backgroundColor: COLOURS.background,
-        padding: 10,
+        paddingTop: 40,
         marginBottom: 20,
         borderRadius: 20,
         borderWidth: 2,
