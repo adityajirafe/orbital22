@@ -99,11 +99,15 @@ def handle_balance(job_item, bot):
 def handle_no_trade(job_item, bot):
     chat_id = job_item.chat_id
     coin = job_item.coin
-    bot.sendText(
-        f"{coin} trade NOT taken",
-        chat_id
-    )
-    print('handled no trade')
+    if coin + "-PERP" not in bot.coins:
+        bot.sendText(f'Invalid coin, we only trade\n{bot.coins[0]}\n{bot.coins[1]}\n{bot.coins[2]}\n{bot.coins[3]}', chat_id)
+        print('invalid coin')
+    else:
+        bot.sendText(
+            f"{coin} trade NOT taken",
+            chat_id
+        )
+        print('handled no trade')
     return
 
 """checks for enough money in account given the amount required to trade"""
@@ -120,13 +124,21 @@ def checkTrade(margin: float, ftx) -> bool:
 
 
 """Handles users executing a long trade"""
-def handle_long_trade(job_item, bot, margin):
+def handle_long_trade(job_item, bot, margin, favoured_trade):
     chat_id = job_item.chat_id
-    # retrieves the correct ftx object from the dictionary corresponding to the chat id
-    ftx = bot.auth_users[chat_id]
     # stored the specific coin in the job item
     coin = job_item.coin
-
+    if coin + "-PERP" not in bot.coins:
+        bot.sendText(f'Invalid coin, we only trade\n{bot.coins[0]}\n{bot.coins[1]}\n{bot.coins[2]}\n{bot.coins[3]}', chat_id)
+        print('invalid coin')
+        return
+    if favoured_trade == 'SHORT':
+        bot.sendText('Cannot take long trade when favoured trade is short', chat_id)
+        print('Cannot take long trade when favoured trade is short')
+        return
+    # retrieves the correct ftx object from the dictionary corresponding to the chat id
+    ftx = bot.auth_users[chat_id]
+    
     email = bot.chatids[chat_id]
     positions = get_positions(email, coin)
 
@@ -180,11 +192,20 @@ def handle_long_trade(job_item, bot, margin):
 
 
 """Handles users executing short trades"""
-def handle_short_trade(job_item, bot, margin):
+def handle_short_trade(job_item, bot, margin, favoured_trade):
     chat_id = job_item.chat_id
-    ftx = bot.auth_users[chat_id]
     coin = job_item.coin
+    if coin + "-PERP" not in bot.coins:
+        bot.sendText(f'Invalid coin, we only trade\n{bot.coins[0]}\n{bot.coins[1]}\n{bot.coins[2]}\n{bot.coins[3]}', chat_id)
+        print('invalid coin')
+        return
+    if favoured_trade == 'LONG':
+        bot.sendText('Cannot take short trade when favoured trade is long', chat_id)
+        print('Cannot take short trade when favoured trade is long')
+        return
+    ftx = bot.auth_users[chat_id]
     
+
     email = bot.chatids[chat_id]
     positions = get_positions(email, coin)
 
@@ -247,6 +268,7 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
         order_type = 'buy'
     elif favoured_trade == 'short':
         order_type = 'sell'
+    
     for doc_id, position in positions:
         # eg of position: {'name': 'long', 'qty': '0.0083', 'price': '$41,803.43', 'coin': 'BTC', 'value': '$346.97', 'time': '2022-03-01, 16:52:45'}
         qty = position['qty']
@@ -255,7 +277,14 @@ def handle_close_trade(positions, favoured_trade, email, bot, chat_id):
         price = bot.prices[coin]
         
         if (name == favoured_trade):
-            continue
+            if favoured_trade == 'long':
+                bot.sendText(f'No open {coin} short positions', chat_id)
+                print(f'No open {coin} short positions')
+                continue
+            else:
+                bot.sendText(f'No open {coin} long positions', chat_id)
+                print(f'No open {coin} long positions')
+                continue
         else:
             print(f"{coin} {name} opened has been closed")
             """Sample Output:
