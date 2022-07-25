@@ -95,11 +95,11 @@ const FriendPortfolioCard = (props) => {
                         onPress={refresh}>
                         <Icon
                             name="refresh"
-                            size={23}
+                            size={24}
                             style={{
                                 color: COLOURS.black,
                                 flex: 1,
-                                marginTop: 10,
+                                marginTop: 2,
                             }}
                         />
                     </Pressable>
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLOURS.secondary,
         marginTop: 2,
         borderRadius: 20,
-        width: 360,
+        width: 340,
     },
     topContainer: {
         flex: 1,
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         marginRight: 10,
-        marginVertical: 2,
+        marginVertical: 10,
     },
     expandButtonContainer: {
         flex: 1,
@@ -294,11 +294,11 @@ const styles = StyleSheet.create({
     },
     titleContainer2: {
         backgroundColor: COLOURS.background,
-        paddingTop: 40,
-        marginBottom: 20,
+        marginBottom: 15,
         borderRadius: 20,
         borderWidth: 2,
         flex: 1,
+        justifyContent: 'center',
     },
     title: {
         fontFamily: 'roboto-bold',
