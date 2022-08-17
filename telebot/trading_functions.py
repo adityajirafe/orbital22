@@ -85,7 +85,8 @@ def trading_algo(bot, coin, interval, ftx):
                     chat_id
                 )
             elif (suggested_trade['type'] == 'NO_TRADE'):
-                bot.sendText(f"{shortened_coin} price is currently {price} USD\nno trade detected for {shortened_coin}")
+                bot.sendText(f"{shortened_coin} price is currently {price} USD\nno trade detected for {shortened_coin}",
+                chat_id)
         else:
             for trade in positions:
                 if trade[1]['coin'] == shortened_coin:
@@ -98,15 +99,20 @@ def trading_algo(bot, coin, interval, ftx):
 def plot_and_save(coin: str, interval: str, ftx: FtxClient):
     df = getData(coin, interval, ftx)
     df = df.tail(150)
+
     #plotting the graph and saving it
     ap2 = [fplt.make_addplot(df['10EMA'], color='#180dad', panel= 1), 
             fplt.make_addplot(df['25EMA'], color='#FFA500', panel= 1),
-            fplt.make_addplot(df['RSI'], color='#6a0dad', panel= 2)]
+            fplt.make_addplot(df['RSI'], color='#6a0dad', panel= 3),
+            fplt.make_addplot(df['macd_s'], color='#ff0000', panel= 2),
+            fplt.make_addplot(df['macd'], color='#7CFC00', panel= 2),
+            fplt.make_addplot(df['macd_hist'],type='bar',width=0.7,panel=2,
+                         color='dimgray',alpha=1,secondary_y=False)]
 
     fplt.plot(
             df,
             type='candle',
-            style= 'charles',
+            style= 'yahoo',
             title= coin + ' chart',
             ylabel='Price ($)',
             main_panel= 1,
@@ -137,6 +143,22 @@ def getData(coin: str, time: str, ftx: FtxClient):
     
     # Adding the 10 day EMA
     df['10EMA'] = df['close'].ewm(span=10, adjust=False).mean()
+
+    # Get the 26-day EMA of the closing price
+    k = df['close'].ewm(span=12, adjust=False, min_periods=12).mean()
+    # Get the 12-day EMA of the closing price
+    d = df['close'].ewm(span=26, adjust=False, min_periods=26).mean()
+    # Subtract the 26-day EMA from the 12-Day EMA to get the MACD
+    macd = k - d
+    # Get the 9-Day EMA of the MACD for the Trigger line
+    macd_s = macd.ewm(span=9, adjust=False, min_periods=9).mean()
+    # Calculate the difference between the MACD - Trigger for the Convergence/Divergence value
+    macd_hist = macd - macd_s
+    # Add all of our new values for the MACD to the dataframe
+    df['macd'] = df.index.map(macd)
+    df['macd_hist'] = df.index.map(macd_hist)
+    df['macd_s'] = df.index.map(macd_s)
+
     return df
 
 
@@ -155,9 +177,12 @@ def detect_trade(coin, interval, ftx) -> dict:
     EMA_10 = df['10EMA'][last_entry_index]
     EMA_25 = df['25EMA'][last_entry_index]
 
-    if EMA_10 > EMA_25:
+    macd_s = df['macd_s'][last_entry_index]
+    macd = df['macd'][last_entry_index]
+
+    if (EMA_10 > EMA_25) and (macd > macd_s):
         return {'type': "LONG", 'price': price}
-    elif EMA_10 < EMA_25:
+    elif (EMA_10 < EMA_25) and (macd < macd_s):
         return {'type': "SHORT", 'price': price}
     else: 
         return{'type': "NO_TRADE", 'price': price}
